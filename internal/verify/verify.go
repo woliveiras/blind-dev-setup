@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"github.com/woliveiras/blind-dev-setup/internal/manifest"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
@@ -27,7 +28,7 @@ var requiredPortableFiles = []string{
 	"tools/vscode/data/user-data/User/settings.json",
 }
 
-func Run(requestedTarget string, output io.Writer) error {
+func Run(requestedTarget string, expected manifest.Manifest, output io.Writer) error {
 	root, err := filepath.Abs(filepath.Join(requestedTarget, target.DirectoryName))
 	if err != nil {
 		return fmt.Errorf("resolver destino: %w", err)
@@ -52,6 +53,9 @@ func Run(requestedTarget string, output io.Writer) error {
 	}
 	if closeErr != nil {
 		return fmt.Errorf("fechar manifesto instalado: %w", closeErr)
+	}
+	if !reflect.DeepEqual(current, expected) {
+		return fmt.Errorf("o manifesto instalado difere do manifesto incorporado neste gerador")
 	}
 	fmt.Fprintf(output, "Manifesto: versão %s; plataforma %s.\n", current.Release, current.Platform)
 

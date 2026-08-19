@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -41,7 +42,9 @@ func main() {
 		Prepare: func(request cli.PrepareRequest) error {
 			return creator.Run(ctx, request.Target, request.Cache, request.Output)
 		},
-		Verify: verify.Run,
+		Verify: func(targetPath string, output io.Writer) error {
+			return verify.Run(targetPath, current, output)
+		},
 	}
 	os.Exit(cli.Run(os.Args[1:], os.Stdout, os.Stderr, dependencies))
 }

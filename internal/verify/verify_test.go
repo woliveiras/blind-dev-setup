@@ -37,7 +37,7 @@ func TestRunChecksManifestComponentsLaunchersAndToolchain(t *testing.T) {
 	}
 
 	var output strings.Builder
-	if err := Run(targetRoot, &output); err != nil {
+	if err := Run(targetRoot, current, &output); err != nil {
 		t.Fatalf("Run() error = %v", err)
 	}
 	if !strings.Contains(output.String(), "Verificação concluída") {
@@ -61,8 +61,35 @@ func TestRunReportsMissingExpectedFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = Run(targetRoot, &strings.Builder{})
+	err = Run(targetRoot, current, &strings.Builder{})
 	if err == nil || !strings.Contains(err.Error(), "START.cmd") {
+		t.Fatalf("Run() error = %v", err)
+	}
+}
+
+func TestRunRejectsInstalledManifestThatDiffersFromBuilder(t *testing.T) {
+	targetRoot := t.TempDir()
+	root := filepath.Join(targetRoot, target.DirectoryName)
+	expected := verificationManifest()
+	installed := verificationManifest()
+	installed.Release = "0.1.0-tampered"
+	raw, err := json.Marshal(installed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, filepath.Join(root, "READY.txt"))
+	if err := os.MkdirAll(filepath.Join(root, "config"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "config", "manifest.json"), raw, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, required := range requiredPortableFiles {
+		writeFile(t, filepath.Join(root, filepath.FromSlash(required)))
+	}
+
+	err = Run(targetRoot, expected, &strings.Builder{})
+	if err == nil || !strings.Contains(err.Error(), "difere") {
 		t.Fatalf("Run() error = %v", err)
 	}
 }
