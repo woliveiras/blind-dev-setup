@@ -13,6 +13,18 @@ Leia o ADR, o manifesto e os limites de evidência. Não trate a presença de ar
 
 Use commits pequenos com Conventional Commits. Não inclua binários de terceiros, credenciais, perfis pessoais do NVDA ou dados de usuários.
 
+## Releases
+
+Release Please acompanha os Conventional Commits em `main` e mantém uma PR de release com versão e changelog. Mesclar essa PR é a autorização humana para criar a tag e a GitHub Release.
+
+Quando a release é criada, o workflow compila a revisão exata da tag em Windows, executa os testes, confere a versão embutida e publica somente estes artefatos:
+
+- `blind-dev-setup-windows-x64.exe`;
+- `blind-dev-setup-windows-x64.zip`;
+- `SHA256SUMS.txt`.
+
+Não envie binários manualmente. O repositório precisa permitir que GitHub Actions crie pull requests em Settings, Actions, General, Workflow permissions. A publicação usa somente o `GITHUB_TOKEN` temporário do próprio workflow.
+
 ## Atualização de componentes
 
 Uma alteração de versão precisa incluir:

@@ -2,7 +2,7 @@
 
 ## Versões suportadas
 
-A série 0.1.x recebe correções enquanto for a versão atual.
+A release estável mais recente recebe correções de segurança.
 
 ## Relatar vulnerabilidade
 
@@ -25,5 +25,7 @@ O projeto considera especialmente:
 - limitações do NVDA Portable em processos elevados.
 
 O gerador não formata unidades, não sobrescreve instalações, verifica artefatos antes de executar ou extrair e passa argumentos diretamente aos processos. O diretório final só é publicado depois da conclusão.
+
+Baixe o utilitário somente pela página oficial de releases. Cada release inclui `SHA256SUMS.txt` para conferir o executável e o ZIP. A versão atual ainda não possui assinatura digital de código; um checksum confirma a integridade do arquivo baixado, mas não substitui uma assinatura confiável.
 
 Um pendrive continua sendo mídia removível. Proteja-o fisicamente, use criptografia quando houver dados sensíveis e não armazene tokens ou chaves sem uma política própria de proteção e recuperação.

@@ -2,7 +2,7 @@
 
 Gerador de um ambiente de desenvolvimento portátil para pessoas cegas, com mensagens lineares e operação por teclado e leitor de tela.
 
-A v0.1.0 prepara um pendrive NTFS para Windows 11 x64 com:
+A versão atual prepara um pendrive NTFS para Windows 11 x64 com:
 
 - Git for Windows Portable;
 - Visual Studio Code Portable como editor principal;
@@ -31,29 +31,44 @@ O gerador:
 
 Use um pendrive de pelo menos 32 GB. A preparação inicial baixa aproximadamente 607 MiB de aplicativos, além dos toolchains instalados pelo mise.
 
-## Construção
+## Baixar e usar
 
-Requisitos para compilar:
+O programa já é distribuído pronto para Windows 11 x64. Você não precisa instalar Go, Git nem outras ferramentas e não precisa compilar o projeto.
 
-- Go 1.25 ou posterior;
-- Git;
-- Windows 11 x64 para executar prepare.
+### Download pela página do GitHub
 
-No PowerShell:
+1. abra a [página da release mais recente](https://github.com/woliveiras/blind-dev-setup/releases/latest);
+2. em Assets, baixe `blind-dev-setup-windows-x64.zip`;
+3. extraia o ZIP;
+4. conecte o pendrive e abra `INICIAR-AQUI.cmd`.
 
-    go test ./...
-    go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+O pacote contém o executável, um guia curto, a licença e o inicializador `INICIAR-AQUI.cmd`. O inicializador procura os pendrives, mostra a letra de cada um e mantém a janela aberta para que a mensagem possa ser lida.
 
-Em macOS ou Linux é possível testar e gerar o executável Windows:
+Também é possível [baixar somente o executável](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe) e usá-lo diretamente, sem instalação.
 
-    go test ./...
-    GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+### Download com curl
 
-O script scripts/build.ps1 executa os testes, cria dist/blind-dev-setup-windows-x64.exe e mostra seu SHA-256.
+No PowerShell ou Prompt de Comando do Windows:
+
+```powershell
+curl.exe -fL "https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe" -o "blind-dev-setup-windows-x64.exe"
+```
+
+### Download com wget
+
+Se `wget` estiver instalado:
+
+```powershell
+wget --https-only -O "blind-dev-setup-windows-x64.exe" "https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe"
+```
+
+O [ZIP mais recente](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.zip) e o arquivo `SHA256SUMS.txt` também ficam disponíveis em todas as releases.
+
+O executável atual não possui assinatura digital. Por isso, o Windows pode apresentar um aviso de segurança mesmo quando o arquivo veio da release oficial. Confira se o endereço começa com `https://github.com/woliveiras/blind-dev-setup/` e, se quiser validar o download, compare seu SHA-256 com `SHA256SUMS.txt`.
 
 ## Uso
 
-Coloque o executável em uma pasta e conecte o pendrive. Para abrir o PowerShell nessa pasta pelo teclado:
+Quem baixou o ZIP pode abrir `INICIAR-AQUI.cmd` para executar o primeiro passo sem digitar comandos. Para usar o executável diretamente, coloque-o em uma pasta e conecte o pendrive. Abra o PowerShell nessa pasta pelo teclado:
 
 1. abra a pasta no Explorador de Arquivos;
 2. pressione Ctrl+L;
@@ -87,6 +102,32 @@ Depois, abra E:\blind-dev-setup\START.cmd para iniciar NVDA e VS Code, ou DEV-SH
 
 Se `list-targets` não encontrar nada, desconecte o pendrive, conecte-o novamente, aguarde alguns segundos e repita o comando. Se o Windows não atribuir uma letra ou o sistema de arquivos não for NTFS, a ferramenta explicará o problema sem tentar formatar a unidade.
 
+## Compilar o projeto
+
+Esta seção é somente para desenvolvimento. Usuários podem utilizar os downloads prontos descritos acima.
+
+Requisitos para compilar:
+
+- Go 1.25 ou posterior;
+- Git;
+- Windows 11 x64 para executar `prepare`.
+
+No PowerShell:
+
+```powershell
+go test ./...
+go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+```
+
+Em macOS ou Linux é possível testar e gerar o executável Windows:
+
+```bash
+go test ./...
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+```
+
+O script `scripts/build.ps1` executa testes e análise estática, cria o executável e o ZIP em `dist` e gera `SHA256SUMS.txt`.
+
 ## Estrutura gerada
 
 - tools contém os aplicativos portáteis;
@@ -107,7 +148,7 @@ mise instala e fixa Python, Node.js, uv e pnpm. Dentro de um projeto Python, use
 
 NVDA Portable não cobre login, UAC, telas seguras ou aplicativos elevados. Para esses fluxos, use uma instalação permanente oficial do NVDA. O gerador não copia perfil pessoal, add-ons, credenciais, tokens ou chaves SSH.
 
-VS Code não recebe extensões automaticamente na v0.1.0; elas exigem uma decisão separada de proveniência e validação. DBeaver precisa de validação empírica com NVDA. Atualização transacional e Linux estão no roadmap.
+VS Code não recebe extensões automaticamente na primeira versão; elas exigem uma decisão separada de proveniência e validação. DBeaver precisa de validação empírica com NVDA. Atualização transacional e Linux estão no roadmap.
 
 Leia [a decisão arquitetural](docs/adr/0001-windows-portable-builder.md), [os limites das evidências](docs/research/evidence-boundaries.md), o [roadmap](ROADMAP.md), as [diretrizes de contribuição](CONTRIBUTING.md) e a [política de segurança](SECURITY.md).
 
