@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -71,5 +72,42 @@ func TestFetchRejectsChecksumMismatchAndRemovesPartialFile(t *testing.T) {
 	}
 	if len(entries) != 0 {
 		t.Fatalf("cache contains partial files: %v", entries)
+	}
+}
+
+func TestFetchReplacesOnlyItsCorruptCacheEntry(t *testing.T) {
+	content := []byte("fresh artifact")
+	server := httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		_, _ = writer.Write(content)
+	}))
+	defer server.Close()
+
+	sum := sha256.Sum256(content)
+	component := manifest.Component{
+		ID:            "editor",
+		Version:       "1.2.3",
+		URL:           server.URL,
+		SHA256:        fmt.Sprintf("%x", sum),
+		DownloadBytes: int64(len(content)),
+	}
+	cache := t.TempDir()
+	cachePath := filepath.Join(cache, component.SHA256+".artifact")
+	if err := os.WriteFile(cachePath, []byte("corrupt"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := (Fetcher{Client: server.Client()}).Fetch(context.Background(), component, cache)
+	if err != nil {
+		t.Fatalf("Fetch() error = %v", err)
+	}
+	if got != cachePath {
+		t.Fatalf("Fetch() path = %q, want %q", got, cachePath)
+	}
+	refreshed, err := os.ReadFile(cachePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(refreshed) != string(content) {
+		t.Fatalf("cache content = %q", refreshed)
 	}
 }

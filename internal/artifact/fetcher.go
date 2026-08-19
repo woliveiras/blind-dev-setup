@@ -26,6 +26,16 @@ func (f Fetcher) Fetch(ctx context.Context, component manifest.Component, cache 
 	} else if valid {
 		return finalPath, nil
 	}
+	if info, err := os.Lstat(finalPath); err == nil {
+		if !info.Mode().IsRegular() {
+			return "", fmt.Errorf("cache de %s não é um arquivo regular", component.ID)
+		}
+		if err := os.Remove(finalPath); err != nil {
+			return "", fmt.Errorf("remover cache inválido de %s: %w", component.ID, err)
+		}
+	} else if !os.IsNotExist(err) {
+		return "", fmt.Errorf("inspecionar cache de %s: %w", component.ID, err)
+	}
 
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, component.URL, nil)
 	if err != nil {
