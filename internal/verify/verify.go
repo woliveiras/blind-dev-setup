@@ -19,6 +19,7 @@ var requiredPortableFiles = []string{
 	"START-NOTEPADPP.cmd",
 	"START-DBEAVER.cmd",
 	"config/environment.cmd",
+	"config/mise.lock",
 	"config/mise.toml",
 	"docs/LEIA-ME.txt",
 	"docs/NVDA.md",

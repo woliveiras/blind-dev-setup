@@ -26,15 +26,27 @@ func (m MiseToolchain) Install(
 		return errors.New("executor do mise não configurado")
 	}
 	miseExecutable := filepath.Join(root, "tools", "mise", "mise.exe")
+	environment := portableEnvironment(root)
+	configFile := filepath.Join(root, "config", "mise.toml")
+	if err := m.Runner.Run(
+		ctx,
+		miseExecutable,
+		[]string{"trust", "--yes", configFile},
+		root,
+		environment,
+		output,
+	); err != nil {
+		return fmt.Errorf("confiar na configuração incorporada: %w", err)
+	}
 	arguments := []string{
 		"install",
 		"--yes",
+		"--locked",
 		"python@" + current.Toolchain["python"],
 		"node@" + current.Toolchain["node"],
 		"uv@" + current.Toolchain["uv"],
 		"pnpm@" + current.Toolchain["pnpm"],
 	}
-	environment := portableEnvironment(root)
 	if err := m.Runner.Run(ctx, miseExecutable, arguments, root, environment, output); err != nil {
 		return err
 	}
@@ -67,13 +79,14 @@ func (m MiseToolchain) Install(
 
 func portableEnvironment(root string) []string {
 	overrides := map[string]string{
-		"MISE_DATA_DIR":   filepath.Join(root, "data", "mise"),
-		"MISE_CACHE_DIR":  filepath.Join(root, "cache", "mise"),
-		"MISE_STATE_DIR":  filepath.Join(root, "data", "mise-state"),
-		"MISE_CONFIG_DIR": filepath.Join(root, "config", "mise"),
-		"UV_CACHE_DIR":    filepath.Join(root, "cache", "uv"),
-		"PNPM_HOME":       filepath.Join(root, "data", "pnpm", "home"),
-		"PNPM_STORE_DIR":  filepath.Join(root, "data", "pnpm", "store"),
+		"MISE_CONFIG_FILE": filepath.Join(root, "config", "mise.toml"),
+		"MISE_DATA_DIR":    filepath.Join(root, "data", "mise"),
+		"MISE_CACHE_DIR":   filepath.Join(root, "cache", "mise"),
+		"MISE_STATE_DIR":   filepath.Join(root, "data", "mise-state"),
+		"MISE_CONFIG_DIR":  filepath.Join(root, "config", "mise"),
+		"UV_CACHE_DIR":     filepath.Join(root, "cache", "uv"),
+		"PNPM_HOME":        filepath.Join(root, "data", "pnpm", "home"),
+		"PNPM_STORE_DIR":   filepath.Join(root, "data", "pnpm", "store"),
 	}
 	result := make([]string, 0, len(os.Environ())+len(overrides))
 	for _, entry := range os.Environ() {

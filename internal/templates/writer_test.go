@@ -6,18 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/woliveiras/blind-dev-setup/internal/manifest"
+	"github.com/woliveiras/blind-dev-setup/internal/bundle"
 )
 
 func TestWriterCreatesPortableLaunchersAndPinnedToolchain(t *testing.T) {
 	root := t.TempDir()
-	current := manifest.Manifest{
-		Toolchain: map[string]string{
-			"python": "3.14.7",
-			"node":   "24.19.0",
-			"uv":     "0.12.5",
-			"pnpm":   "11.22.0",
-		},
+	current, err := bundle.WindowsManifest()
+	if err != nil {
+		t.Fatal(err)
 	}
 	writer := Writer{Manifest: current}
 
@@ -34,6 +30,7 @@ func TestWriterCreatesPortableLaunchersAndPinnedToolchain(t *testing.T) {
 		"config/environment.cmd",
 		"config/manifest.json",
 		"config/mise.toml",
+		"config/mise.lock",
 		"tools/vscode/data/user-data/User/settings.json",
 		"workspace/python-example/pyproject.toml",
 		"workspace/node-workspace/pnpm-workspace.yaml",
@@ -47,14 +44,25 @@ func TestWriterCreatesPortableLaunchersAndPinnedToolchain(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{
-		"python = \"3.14.7\"",
-		"node = \"24.19.0\"",
-		"uv = \"0.12.5\"",
-		"pnpm = \"11.22.0\"",
-	} {
+	for tool, version := range current.Toolchain {
+		want := tool + " = \"" + version + "\""
 		if !strings.Contains(string(miseConfig), want) {
 			t.Errorf("mise.toml does not contain %q:\n%s", want, miseConfig)
+		}
+	}
+	miseLock, err := os.ReadFile(filepath.Join(root, "config", "mise.lock"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, version := range current.Toolchain {
+		want := "version = \"" + version + "\""
+		if !strings.Contains(string(miseLock), want) {
+			t.Errorf("mise.lock does not contain %q", want)
+		}
+	}
+	for _, want := range []string{"platforms.windows-x64", "checksum = \"sha256:"} {
+		if !strings.Contains(string(miseLock), want) {
+			t.Errorf("mise.lock does not contain %q", want)
 		}
 	}
 }
