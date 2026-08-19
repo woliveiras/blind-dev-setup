@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "release": "0.1.0",
+  "platform": "windows-x64",
+  "minimum_free_bytes": 12884901888,
+  "toolchain": {
+    "python": "3.14.7",
+    "node": "24.19.0",
+    "uv": "0.12.5",
+    "pnpm": "11.22.0"
+  },
+  "components": [
+    {
+      "id": "git",
+      "name": "Git for Windows Portable",
+      "version": "2.55.0.4",
+      "required": true,
+      "url": "https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.4/PortableGit-2.55.0.4-64-bit.7z.exe",
+      "sha256": "016e84230a3767f0c6b3788e79ba0c58a17377086801719d46700fca4f7b36b5",
+      "license": "GPL-2.0-only",
+      "license_url": "https://github.com/git-for-windows/git/blob/main/COPYING",
+      "kind": "self-extracting-7zip",
+      "destination": "tools/git",
+      "download_bytes": 58915456,
+      "arguments": ["-y", "-o{destination}"],
+      "expected_files": ["cmd/git.exe", "bin/bash.exe"]
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code Portable",
+      "version": "1.134.0",
+      "required": true,
+      "url": "https://update.code.visualstudio.com/1.134.0/win32-x64-archive/stable",
+      "sha256": "59d3e1816961abb53d3bcc264083ee7e3f2282a6ff1004c4a1a8411b92a7a45d",
+      "license": "Microsoft Software License Terms",
+      "license_url": "https://code.visualstudio.com/License/",
+      "kind": "zip",
+      "destination": "tools/vscode",
+      "download_bytes": 334846983,
+      "expected_files": ["Code.exe"]
+    },
+    {
+      "id": "nvda",
+      "name": "NVDA Portable",
+      "version": "2026.1.1",
+      "required": true,
+      "url": "https://github.com/nvaccess/nvda/releases/download/release-2026.1.1/nvda_2026.1.1.exe",
+      "sha256": "6e0289eb5a3aa076eb97ea99c5d5465cb48b5ecc6a3257dc3d811f881a1747c9",
+      "license": "GPL-2.0-only",
+      "license_url": "https://github.com/nvaccess/nvda/blob/master/copying.txt",
+      "kind": "nvda-portable",
+      "destination": "tools/nvda",
+      "download_bytes": 62914952,
+      "expected_files": ["nvda.exe"]
+    },
+    {
+      "id": "notepad-plus-plus",
+      "name": "Notepad++ Portable",
+      "version": "8.9.7",
+      "required": true,
+      "url": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.7/npp.8.9.7.portable.x64.zip",
+      "sha256": "ff394c496ecb5c8b231feca05387edbfb704e85db3ba956b994bbadbe7520806",
+      "license": "GPL-3.0-or-later",
+      "license_url": "https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/LICENSE",
+      "kind": "zip",
+      "destination": "tools/notepad-plus-plus",
+      "download_bytes": 8210819,
+      "expected_files": ["notepad++.exe"]
+    },
+    {
+      "id": "dbeaver",
+      "name": "DBeaver Community Portable",
+      "version": "26.1.4",
+      "required": true,
+      "url": "https://dbeaver.io/files/26.1.4/dbeaver-ce-26.1.4-windows-x86_64.zip",
+      "sha256": "27bda23dc227760f9a48beee631d353b1d5b8c8ddb3096c6d66259fa860e0a45",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/dbeaver/dbeaver/blob/devel/LICENSE.md",
+      "kind": "zip",
+      "destination": "tools/dbeaver",
+      "download_bytes": 127756479,
+      "strip_components": 1,
+      "expected_files": ["dbeaver.exe"]
+    },
+    {
+      "id": "mise",
+      "name": "mise",
+      "version": "2026.8.8",
+      "required": true,
+      "url": "https://github.com/jdx/mise/releases/download/v2026.8.8/mise-v2026.8.8-windows-x64.zip",
+      "sha256": "bbd30ceb118db40a21371a0767d61b24cb41a26a91fdd49b411ccce1e38e350d",
+      "license": "MIT",
+      "license_url": "https://github.com/jdx/mise/blob/main/LICENSE",
+      "kind": "zip",
+      "destination": "tools/mise",
+      "download_bytes": 43663811,
+      "expected_files": ["mise.exe"]
+    }
+  ]
+}
