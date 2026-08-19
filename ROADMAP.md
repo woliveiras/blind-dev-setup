@@ -17,4 +17,3 @@
 - Projetar e validar suporte a Linux, incluindo leitor de tela, terminal, editor, empacotamento e launchers próprios da plataforma.
 
 Linux não será uma simples tradução dos arquivos `.cmd`: o suporte só será declarado quando os fluxos equivalentes tiverem sido testados na plataforma.
-

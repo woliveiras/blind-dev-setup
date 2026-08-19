@@ -49,4 +49,3 @@ A preparação inicial exige internet e pode levar tempo. O pendrive precisa usa
 O NVDA Portable não oferece leitura de login, UAC ou aplicativos elevados como uma instalação permanente. O projeto documentará a instalação permanente como alternativa quando esses fluxos forem necessários.
 
 Windows é a única plataforma suportada na v0.1.0. Linux permanece no roadmap e terá decisões e testes próprios.
-
