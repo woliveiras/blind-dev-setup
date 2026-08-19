@@ -14,6 +14,7 @@ var (
 	kernel32              = syscall.NewLazyDLL("kernel32.dll")
 	getVolumeInformationW = kernel32.NewProc("GetVolumeInformationW")
 	getDiskFreeSpaceExW   = kernel32.NewProc("GetDiskFreeSpaceExW")
+	getWindowsDirectoryW  = kernel32.NewProc("GetWindowsDirectoryW")
 )
 
 func Inspect(path string) (Details, error) {
@@ -41,6 +42,10 @@ func Inspect(path string) (Details, error) {
 	if err != nil {
 		return Details{}, err
 	}
+	systemVolume, err := windowsSystemVolume()
+	if err != nil {
+		return Details{}, err
+	}
 	_, destinationErr := os.Stat(filepath.Join(absolute, DirectoryName))
 	if destinationErr != nil && !os.IsNotExist(destinationErr) {
 		return Details{}, fmt.Errorf("verificar instalação existente: %w", destinationErr)
@@ -49,11 +54,30 @@ func Inspect(path string) (Details, error) {
 	return Details{
 		Path:              absolute,
 		Volume:            volume,
-		SystemVolume:      filepath.VolumeName(os.Getenv("SystemDrive") + "\\"),
+		SystemVolume:      systemVolume,
 		FileSystem:        fileSystem,
 		FreeBytes:         freeBytes,
 		DestinationExists: destinationErr == nil,
 	}, nil
+}
+
+func windowsSystemVolume() (string, error) {
+	buffer := make([]uint16, 32768)
+	length, _, callErr := getWindowsDirectoryW.Call(
+		uintptr(unsafe.Pointer(&buffer[0])),
+		uintptr(len(buffer)),
+	)
+	if length == 0 {
+		return "", fmt.Errorf("consultar diretório do Windows: %w", callErr)
+	}
+	if length >= uintptr(len(buffer)) {
+		return "", fmt.Errorf("consultar diretório do Windows: caminho excede o limite")
+	}
+	volume := filepath.VolumeName(syscall.UTF16ToString(buffer[:length]))
+	if volume == "" {
+		return "", fmt.Errorf("consultar diretório do Windows: volume não identificado")
+	}
+	return volume, nil
 }
 
 func volumeFileSystem(root string) (string, error) {
