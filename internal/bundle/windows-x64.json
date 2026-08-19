@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "0.1.0",
+  "release": "0.2.0",
   "platform": "windows-x64",
   "minimum_free_bytes": 12884901888,
   "toolchain": {
@@ -22,8 +22,14 @@
       "kind": "self-extracting-7zip",
       "destination": "tools/git",
       "download_bytes": 58915456,
-      "arguments": ["-y", "-o{destination}"],
-      "expected_files": ["cmd/git.exe", "bin/bash.exe"]
+      "arguments": [
+        "-y",
+        "-o{destination}"
+      ],
+      "expected_files": [
+        "cmd/git.exe",
+        "bin/bash.exe"
+      ]
     },
     {
       "id": "vscode",
@@ -37,7 +43,9 @@
       "kind": "zip",
       "destination": "tools/vscode",
       "download_bytes": 334846983,
-      "expected_files": ["Code.exe"]
+      "expected_files": [
+        "Code.exe"
+      ]
     },
     {
       "id": "nvda",
@@ -51,7 +59,9 @@
       "kind": "nvda-portable",
       "destination": "tools/nvda",
       "download_bytes": 62914952,
-      "expected_files": ["nvda.exe"]
+      "expected_files": [
+        "nvda.exe"
+      ]
     },
     {
       "id": "notepad-plus-plus",
@@ -65,7 +75,9 @@
       "kind": "zip",
       "destination": "tools/notepad-plus-plus",
       "download_bytes": 8210819,
-      "expected_files": ["notepad++.exe"]
+      "expected_files": [
+        "notepad++.exe"
+      ]
     },
     {
       "id": "dbeaver",
@@ -80,7 +92,9 @@
       "destination": "tools/dbeaver",
       "download_bytes": 127756479,
       "strip_components": 1,
-      "expected_files": ["dbeaver.exe"]
+      "expected_files": [
+        "dbeaver.exe"
+      ]
     },
     {
       "id": "mise",
@@ -94,7 +108,9 @@
       "kind": "zip",
       "destination": "tools/mise",
       "download_bytes": 43663811,
-      "expected_files": ["mise.exe"]
+      "expected_files": [
+        "mise.exe"
+      ]
     }
   ]
 }
