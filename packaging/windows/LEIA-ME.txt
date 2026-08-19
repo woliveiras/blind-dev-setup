@@ -1,0 +1,29 @@
+BLIND-DEV-SETUP PARA WINDOWS 11 X64
+
+Este pacote ja contem o programa pronto. Nao e preciso instalar Go, compilar o projeto ou executar como administrador.
+
+PRIMEIRO USO
+
+1. Conecte o pendrive.
+2. Abra INICIAR-AQUI.cmd.
+3. O programa mostrara a letra, o nome, o tamanho e a situacao dos pendrives encontrados.
+4. Confirme o nome e o tamanho antes de usar a letra indicada.
+
+O programa nao formata, nao particiona e nao escolhe um pendrive automaticamente.
+
+USO PELA LINHA DE COMANDO
+
+Procurar pendrives:
+  .\blind-dev-setup-windows-x64.exe list-targets
+
+Ver o plano sem modificar o pendrive, usando E: como exemplo:
+  .\blind-dev-setup-windows-x64.exe plan --target E:\
+
+Preparar depois de conferir o plano e as licencas:
+  .\blind-dev-setup-windows-x64.exe prepare --target E:\ --accept-licenses
+
+Verificar um ambiente preparado:
+  .\blind-dev-setup-windows-x64.exe verify --target E:\
+
+Projeto e atualizacoes:
+  https://github.com/woliveiras/blind-dev-setup
