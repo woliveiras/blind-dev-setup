@@ -16,6 +16,7 @@ const CurrentSchemaVersion = 1
 var (
 	componentIDPattern = regexp.MustCompile("^[a-z][a-z0-9-]*$")
 	sha256Pattern      = regexp.MustCompile("^[a-f0-9]{64}$")
+	versionPattern     = regexp.MustCompile("^[A-Za-z0-9][A-Za-z0-9.+_-]*$")
 	windowsVolume      = regexp.MustCompile("^[A-Za-z]:")
 )
 
@@ -86,7 +87,7 @@ func (m Manifest) Validate() error {
 		return errors.New("minimum_free_bytes must be positive")
 	}
 	for _, tool := range []string{"python", "node", "uv", "pnpm"} {
-		if strings.TrimSpace(m.Toolchain[tool]) == "" {
+		if !versionPattern.MatchString(m.Toolchain[tool]) {
 			return fmt.Errorf("toolchain version for %s is required", tool)
 		}
 	}
@@ -111,7 +112,7 @@ func (c Component) validate() error {
 	if !componentIDPattern.MatchString(c.ID) {
 		return fmt.Errorf("invalid id %q", c.ID)
 	}
-	if strings.TrimSpace(c.Name) == "" || strings.TrimSpace(c.Version) == "" {
+	if strings.TrimSpace(c.Name) == "" || !versionPattern.MatchString(c.Version) {
 		return errors.New("name and version are required")
 	}
 	if err := validateHTTPS(c.URL, "download URL"); err != nil {
