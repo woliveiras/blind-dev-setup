@@ -35,6 +35,16 @@ func TestParseRejectsUnsafeOrUnverifiableComponents(t *testing.T) {
 		{name: "parent destination", edit: func(m *Manifest) { m.Components[0].Destination = "../tool" }, want: "relative"},
 		{name: "unknown installer", edit: func(m *Manifest) { m.Components[0].Kind = "powershell" }, want: "kind"},
 		{name: "duplicate component", edit: func(m *Manifest) { m.Components = append(m.Components, m.Components[0]) }, want: "duplicate"},
+		{
+			name: "overlapping destinations",
+			edit: func(m *Manifest) {
+				second := m.Components[0]
+				second.ID = "nested"
+				second.Destination = "tools/editor/extensions"
+				m.Components = append(m.Components, second)
+			},
+			want: "overlap",
+		},
 	}
 
 	for _, tt := range tests {

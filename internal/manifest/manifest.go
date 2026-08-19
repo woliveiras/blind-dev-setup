@@ -96,6 +96,7 @@ func (m Manifest) Validate() error {
 	}
 
 	ids := make(map[string]struct{}, len(m.Components))
+	destinations := make(map[string]string, len(m.Components))
 	for index, component := range m.Components {
 		if err := component.validate(); err != nil {
 			return fmt.Errorf("component %d: %w", index+1, err)
@@ -104,6 +105,13 @@ func (m Manifest) Validate() error {
 			return fmt.Errorf("duplicate component id %q", component.ID)
 		}
 		ids[component.ID] = struct{}{}
+		destination := strings.ToLower(strings.ReplaceAll(path.Clean(strings.ReplaceAll(component.Destination, "\\", "/")), "\\", "/"))
+		for previous, previousID := range destinations {
+			if destination == previous || strings.HasPrefix(destination, previous+"/") || strings.HasPrefix(previous, destination+"/") {
+				return fmt.Errorf("component destinations overlap: %s and %s", previousID, component.ID)
+			}
+		}
+		destinations[destination] = component.ID
 	}
 	return nil
 }
