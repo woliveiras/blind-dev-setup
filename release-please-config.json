@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "9d4805d8728b7c6f99304f4834bb5adaa899d978",
+  "packages": {
+    ".": {
+      "release-type": "go",
+      "package-name": "blind-dev-setup",
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "bump-minor-pre-major": true,
+      "draft": true,
+      "changelog-sections": [
+        {
+          "type": "feat",
+          "section": "Adicionado"
+        },
+        {
+          "type": "fix",
+          "section": "Corrigido"
+        },
+        {
+          "type": "perf",
+          "section": "Desempenho"
+        },
+        {
+          "type": "docs",
+          "section": "Documentação"
+        },
+        {
+          "type": "build",
+          "section": "Build"
+        },
+        {
+          "type": "ci",
+          "section": "Automação"
+        },
+        {
+          "type": "refactor",
+          "section": "Refatoração"
+        },
+        {
+          "type": "test",
+          "section": "Testes",
+          "hidden": true
+        },
+        {
+          "type": "chore",
+          "section": "Manutenção",
+          "hidden": true
+        }
+      ],
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "internal/bundle/windows-x64.json",
+          "jsonpath": "$.release"
+        }
+      ]
+    }
+  }
+}
