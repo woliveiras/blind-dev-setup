@@ -49,4 +49,5 @@ jobs:
         shell: pwsh
         run: |
           .\dist\blind-dev-setup-windows-x64.exe version
+          .\dist\blind-dev-setup-windows-x64.exe list-targets
           .\dist\blind-dev-setup-windows-x64.exe plan --target E:\
