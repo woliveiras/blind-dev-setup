@@ -1,0 +1,8 @@
+{
+  "name": "node-workspace-example",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "start": "pnpm --filter hello start"
+  }
+}

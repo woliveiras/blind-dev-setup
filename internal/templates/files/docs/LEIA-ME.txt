@@ -1,0 +1,28 @@
+BLIND-DEV-SETUP 0.1.0
+
+Este ambiente foi preparado para Windows 11 x64.
+
+INICIO RAPIDO
+
+1. Abra START.cmd para iniciar o NVDA Portable e o Visual Studio Code.
+2. Abra DEV-SHELL.cmd para usar Python, Node.js, Git, uv e pnpm.
+3. Salve seus projetos dentro da pasta workspace.
+4. Leia NVDA.md antes de personalizar fala, símbolos ou add-ons.
+5. Execute o protocolo de VALIDACAO.md antes de depender do ambiente para trabalho.
+
+OUTROS INICIALIZADORES
+
+- START-NVDA.cmd inicia apenas o NVDA.
+- START-VSCODE.cmd inicia apenas o VS Code.
+- START-NOTEPADPP.cmd inicia o editor auxiliar Notepad++.
+- START-DBEAVER.cmd inicia o DBeaver com os dados no pendrive.
+
+LIMITES IMPORTANTES
+
+O NVDA Portable não lê a tela de login, telas UAC nem aplicativos executados como administrador. Não execute editores ou terminais como administrador. Se esses fluxos forem necessários, use uma instalação permanente do NVDA no computador.
+
+DBeaver é experimental neste projeto até que seus fluxos sejam validados por pessoas cegas com NVDA.
+
+O ambiente não contém senhas, tokens, chaves SSH ou identidade Git. Configure apenas o que você decidir levar no pendrive e proteja fisicamente a unidade.
+
+Se a letra do pendrive mudar, os projetos continuam sendo a fonte de verdade. Ambientes .venv e node_modules podem precisar ser recriados a partir de pyproject.toml, uv.lock, package.json e pnpm-lock.yaml.
