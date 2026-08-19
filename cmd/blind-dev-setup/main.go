@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/woliveiras/blind-dev-setup/internal/artifact"
 	"github.com/woliveiras/blind-dev-setup/internal/bundle"
@@ -29,13 +30,11 @@ func main() {
 	creator := prepare.Creator{
 		Manifest:     current,
 		ManifestJSON: bundle.WindowsManifestJSON(),
-		Fetch: artifact.Fetcher{Client: &http.Client{
-			CheckRedirect: secureRedirect,
-		}},
-		Install:     prepare.Installer{Runner: runner},
-		Materialize: templates.Writer{Manifest: current},
-		Toolchain:   prepare.MiseToolchain{Runner: runner},
-		Inspect:     target.Inspect,
+		Fetch:        artifact.Fetcher{Client: downloadClient()},
+		Install:      prepare.Installer{Runner: runner},
+		Materialize:  templates.Writer{Manifest: current},
+		Toolchain:    prepare.MiseToolchain{Runner: runner},
+		Inspect:      target.Inspect,
 	}
 	dependencies := cli.Dependencies{
 		Manifest: current,
@@ -45,6 +44,13 @@ func main() {
 		Verify: verify.Run,
 	}
 	os.Exit(cli.Run(os.Args[1:], os.Stdout, os.Stderr, dependencies))
+}
+
+func downloadClient() *http.Client {
+	return &http.Client{
+		Timeout:       30 * time.Minute,
+		CheckRedirect: secureRedirect,
+	}
 }
 
 func secureRedirect(request *http.Request, previous []*http.Request) error {
