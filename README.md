@@ -20,7 +20,7 @@ O código e o executável Windows foram validados automaticamente. O protocolo c
 O gerador:
 
 - exige um destino explícito;
-- nunca formata, particiona ou escolhe uma unidade;
+- pode listar pendrives conectados, mas nunca formata, particiona ou escolhe uma unidade;
 - recusa o disco do sistema;
 - exige NTFS e 12 GiB livres;
 - recusa sobrescrever uma pasta blind-dev-setup existente;
@@ -53,7 +53,19 @@ O script scripts/build.ps1 executa os testes, cria dist/blind-dev-setup-windows-
 
 ## Uso
 
-Primeiro, descubra no Explorador de Arquivos a letra correta do pendrive. Os exemplos usam E:.
+Coloque o executável em uma pasta e conecte o pendrive. Para abrir o PowerShell nessa pasta pelo teclado:
+
+1. abra a pasta no Explorador de Arquivos;
+2. pressione Ctrl+L;
+3. digite powershell e pressione Enter.
+
+Procure os pendrives conectados:
+
+    .\blind-dev-setup-windows-x64.exe list-targets
+
+O comando mostra nome, letra, nome do volume, sistema de arquivos, tamanho, espaço livre e situação de cada unidade USB. Ele não modifica nada e explica o próximo passo. Compare o nome e o tamanho apresentados com o pendrive conectado antes de usar a letra indicada.
+
+Os exemplos seguintes usam E:. Troque E: pela letra mostrada para o seu pendrive.
 
 Mostre o plano sem escrever:
 
@@ -72,6 +84,8 @@ Verifique uma preparação sem modificá-la:
     .\blind-dev-setup-windows-x64.exe verify --target E:\
 
 Depois, abra E:\blind-dev-setup\START.cmd para iniciar NVDA e VS Code, ou DEV-SHELL.cmd para abrir o shell portátil.
+
+Se `list-targets` não encontrar nada, desconecte o pendrive, conecte-o novamente, aguarde alguns segundos e repita o comando. Se o Windows não atribuir uma letra ou o sistema de arquivos não for NTFS, a ferramenta explicará o problema sem tentar formatar a unidade.
 
 ## Estrutura gerada
 

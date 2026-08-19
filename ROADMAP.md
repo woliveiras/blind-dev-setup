@@ -2,6 +2,7 @@
 
 ## v0.1.0 - Windows 11 x64
 
+- Identificar pendrives USB e mostrar a letra correta sem modificar ou selecionar uma unidade.
 - Gerar e verificar um ambiente novo em pendrive NTFS.
 - Instalar artefatos oficiais fixados e conferir SHA-256 antes de extrair ou executar.
 - Manter configurações, caches, workspaces e dados no pendrive.

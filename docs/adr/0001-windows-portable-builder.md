@@ -12,13 +12,14 @@ Uma ISO ou imagem bruta seria rígida, difícil de atualizar e perigosa para dad
 
 ## Decisão
 
-A v0.1.0 será uma CLI escrita em Go e distribuída como um único executável Windows x64. Ela terá três operações:
+A v0.1.0 será uma CLI escrita em Go e distribuída como um único executável Windows x64. Ela terá quatro operações:
 
+- `list-targets`: consulta os volumes de discos USB, mostra as letras disponíveis e orienta o próximo passo sem escrever;
 - `plan`: mostra o destino, espaço estimado, componentes, versões e ações sem escrever;
 - `prepare`: prepara uma instalação nova somente após receber um destino explícito e `--accept-licenses`;
 - `verify`: confere a estrutura, o manifesto instalado e os executáveis esperados sem modificar arquivos.
 
-O gerador nunca formata ou particiona uma unidade, nunca seleciona um destino automaticamente, recusa o disco do sistema e recusa sobrescrever `blind-dev-setup` já existente. Os arquivos são montados em uma pasta temporária na mesma unidade; o diretório final só aparece depois que todas as etapas terminam.
+O gerador pode listar candidatos conectados por USB, mas nunca formata ou particiona uma unidade nem seleciona um destino automaticamente. Mesmo quando existe apenas um candidato, `plan` e `prepare` exigem a letra explícita. O gerador recusa o disco do sistema e recusa sobrescrever `blind-dev-setup` já existente. Os arquivos são montados em uma pasta temporária na mesma unidade; o diretório final só aparece depois que todas as etapas terminam.
 
 Cada binário de terceiro é baixado de uma URL oficial, em versão fixada, e validado por SHA-256 antes de uso. Os binários não entram no Git. O manifesto registra versão, fonte, licença, tipo de instalação e arquivos esperados.
 

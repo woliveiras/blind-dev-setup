@@ -6,7 +6,8 @@ As mudanças relevantes deste projeto serão registradas neste arquivo.
 
 ### Adicionado
 
-- CLI com plan, prepare, verify e version.
+- CLI com list-targets, plan, prepare, verify e version.
+- Descoberta somente leitura de pendrives USB, com diagnóstico e próximos passos em texto linear.
 - Manifesto Windows x64 com versões, fontes, licenças, tamanhos e SHA-256 fixados.
 - Preparação transacional sem formatação ou seleção automática de unidade.
 - Git, VS Code, NVDA, Notepad++, DBeaver e mise portáteis.
