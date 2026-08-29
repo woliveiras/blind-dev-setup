@@ -63,8 +63,27 @@ func TestReleasePleaseTracksOneGoPackageAndEmbeddedVersion(t *testing.T) {
 	); err != nil {
 		t.Fatalf("decode .release-please-manifest.json: %v", err)
 	}
-	if len(manifest) != 1 || manifest["."] != "0.1.0" {
-		t.Errorf("release manifest = %#v", manifest)
+	if len(manifest) != 1 {
+		t.Fatalf("release manifest = %#v", manifest)
+	}
+	releaseVersion, ok := manifest["."]
+	if !ok || releaseVersion == "" {
+		t.Fatalf("root package release version = %q", releaseVersion)
+	}
+
+	// Release Please updates both files for every release; their versions must
+	// stay synchronized without pinning this test to a specific release number.
+	var bundle struct {
+		Release string `json:"release"`
+	}
+	if err := json.Unmarshal(
+		[]byte(readFile(t, filepath.Join(root, "internal", "bundle", "windows-x64.json"))),
+		&bundle,
+	); err != nil {
+		t.Fatalf("decode internal/bundle/windows-x64.json: %v", err)
+	}
+	if bundle.Release != releaseVersion {
+		t.Errorf("embedded release version = %q, want %q", bundle.Release, releaseVersion)
 	}
 }
 
