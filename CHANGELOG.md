@@ -2,6 +2,13 @@
 
 As mudanças relevantes deste projeto serão registradas neste arquivo.
 
+## [0.3.1](https://github.com/woliveiras/blind-dev-setup/compare/v0.3.0...v0.3.1) (2026-08-29)
+
+
+### Corrigido
+
+* extract mise executable into expected directory ([1ab0d5f](https://github.com/woliveiras/blind-dev-setup/commit/1ab0d5fe0c19bd30934cd9732337da02daa2f2a5))
+
 ## [0.3.0](https://github.com/woliveiras/blind-dev-setup/compare/v0.2.0...v0.3.0) (2026-08-29)
 
 
