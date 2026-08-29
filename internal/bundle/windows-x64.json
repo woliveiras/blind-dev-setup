@@ -108,6 +108,7 @@
       "kind": "zip",
       "destination": "tools/mise",
       "download_bytes": 43663811,
+      "strip_components": 2,
       "expected_files": [
         "mise.exe"
       ]
