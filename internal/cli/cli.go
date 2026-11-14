@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -17,19 +18,24 @@ type PrepareRequest struct {
 }
 
 type Dependencies struct {
-	Manifest    manifest.Manifest
-	ListTargets func() ([]target.Candidate, error)
-	Prepare     func(PrepareRequest) error
-	Verify      func(target string, output io.Writer) error
+	Manifest        manifest.Manifest
+	Input           io.Reader
+	Context         context.Context
+	ListTargets     func() ([]target.Candidate, error)
+	Inspect         func(string) (target.Details, error)
+	OpenEnvironment func(string) error
+	Prepare         func(PrepareRequest) error
+	Verify          func(target string, output io.Writer) error
 }
 
 func Run(args []string, stdout, stderr io.Writer, dependencies Dependencies) int {
 	if len(args) == 0 {
-		printUsage(stderr)
-		return 2
+		return runWizard(nil, stdout, stderr, dependencies)
 	}
 
 	switch args[0] {
+	case "wizard":
+		return runWizard(args[1:], stdout, stderr, dependencies)
 	case "help", "--help", "-h":
 		printUsage(stdout)
 		return 0
@@ -256,6 +262,7 @@ func printUsage(output io.Writer) {
 		`  .\blind-dev-setup-windows-x64.exe list-targets`,
 		"",
 		"Comandos:",
+		"  wizard   prepara o pendrive nesta janela, com escolhas e confirmações",
 		"  list-targets  procura pendrives e mostra qual letra usar",
 		"  plan     mostra componentes, licenças e ações sem escrever",
 		"  prepare  prepara um ambiente novo no destino explícito",

@@ -4,6 +4,8 @@ A versão deste ambiente está em READY.txt e config/manifest.json.
 
 Este ambiente foi preparado para Windows 11 x64.
 
+A preparação pode ser feita pelo assistente de INICIAR-AQUI.cmd no pacote do gerador. Ele conduz seleção, licenças, confirmação do destino, preparação e verificação na mesma janela. Ao terminar, permite abrir a pasta deste ambiente no Explorador de Arquivos, preparar outro pendrive ou sair. Abrir a pasta não inicia NVDA ou VS Code: use START.cmd quando desejar. Conclusão do assistente não substitui a validação prática por teclado e NVDA.
+
 INICIO RAPIDO
 
 1. Abra START.cmd para iniciar o NVDA Portable e o Visual Studio Code.

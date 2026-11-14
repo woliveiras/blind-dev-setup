@@ -42,7 +42,7 @@ O programa já é distribuído pronto para Windows 11 x64. Você não precisa in
 3. extraia o ZIP;
 4. conecte o pendrive e abra `INICIAR-AQUI.cmd`.
 
-O pacote contém o executável, um guia curto, a licença e o inicializador `INICIAR-AQUI.cmd`. O inicializador procura os pendrives, mostra a letra de cada um e mantém a janela aberta para que a mensagem possa ser lida.
+O pacote contém o executável, os guias, a licença e o inicializador `INICIAR-AQUI.cmd`. Ele abre um assistente que conduz a escolha do pendrive, o aceite das licenças, a confirmação do destino, a preparação e a verificação na mesma janela. Ao concluir, você pode abrir a pasta do ambiente, preparar outro pendrive ou sair.
 
 Também é possível [baixar somente o executável](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe) e usá-lo diretamente, sem instalação.
 
@@ -68,7 +68,23 @@ O executável atual não possui assinatura digital. Por isso, o Windows pode apr
 
 ## Uso
 
-Quem baixou o ZIP pode abrir `INICIAR-AQUI.cmd` para executar o primeiro passo sem digitar comandos. Para usar o executável diretamente, coloque-o em uma pasta e conecte o pendrive. Abra o PowerShell nessa pasta pelo teclado:
+### Assistente na mesma janela
+
+Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. O assistente apresenta mensagens lineares e aceita respostas pelo teclado:
+
+1. Confira nome, letra, tamanho, espaço livre e situação de cada unidade; digite o número da unidade desejada. A escolha é explícita mesmo quando só há um pendrive.
+2. Use `R` para atualizar a lista ou `0` para sair. Se houver um impedimento, leia o motivo e permaneça no assistente para escolher outra unidade ou atualizar a lista.
+3. Leia o plano com ferramentas, versões e links das licenças. Digite `ACEITO` para aceitar as licenças e `SIM` para confirmar o destino quando solicitado. A preparação só começa após essas confirmações.
+4. Acompanhe downloads, preparação e verificação na mesma janela. Em caso de falha, leia a mensagem e escolha uma das opções de recuperação apresentadas.
+5. No menu final, escolha `1` para abrir a pasta do ambiente no Explorador de Arquivos, `2` para preparar outro pendrive ou `0` para sair. Na pasta do ambiente, abra `START.cmd` para iniciar NVDA e VS Code quando desejar; esses aplicativos não são iniciados automaticamente pelo assistente.
+
+Se a unidade escolhida já tiver uma instalação, o assistente oferece verificá-la: confirme com `SIM` para executar a verificação e chegar ao menu final, sem preparar novamente nem sobrescrever arquivos.
+
+Você não precisa fechar o assistente e abrir outro terminal para preparar o pendrive. O programa continua sem formatar ou sobrescrever ambientes existentes. A conclusão confirma preparação e verificação estrutural; a avaliação de uso por teclado e NVDA ainda exige o protocolo prático. As extensões Python permanecem opcionais e têm um guia próprio.
+
+### Linha de comando opcional
+
+Os comandos abaixo permanecem disponíveis para automação e diagnóstico. Para usá-los, abra o PowerShell na pasta do executável pelo teclado:
 
 1. abra a pasta no Explorador de Arquivos;
 2. pressione Ctrl+L;
@@ -160,7 +176,7 @@ NVDA Portable não cobre login, UAC, telas seguras ou aplicativos elevados. Para
 
 VS Code não recebe extensões automaticamente; o guia Python documenta a instalação opcional e o registro das versões. DBeaver precisa de validação empírica com NVDA. Atualização transacional, Windows arm64 e Linux estão no roadmap.
 
-Leia [a decisão arquitetural](docs/adr/0001-windows-portable-builder.md), [os limites das evidências](docs/research/evidence-boundaries.md), o [roadmap](ROADMAP.md), as [diretrizes de contribuição](CONTRIBUTING.md) e a [política de segurança](SECURITY.md).
+Leia [a decisão arquitetural](docs/adr/0001-windows-portable-builder.md), [a decisão sobre o assistente](docs/adr/0002-guided-wizard.md), [os limites das evidências](docs/research/evidence-boundaries.md), o [roadmap](ROADMAP.md), as [diretrizes de contribuição](CONTRIBUTING.md) e a [política de segurança](SECURITY.md).
 
 ## Licenças
 

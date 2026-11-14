@@ -38,8 +38,12 @@ func main() {
 		Inspect:      target.Inspect,
 	}
 	dependencies := cli.Dependencies{
-		Manifest:    current,
-		ListTargets: target.List,
+		Input:           os.Stdin,
+		Context:         ctx,
+		Manifest:        current,
+		ListTargets:     target.List,
+		Inspect:         target.Inspect,
+		OpenEnvironment: openEnvironment,
 		Prepare: func(request cli.PrepareRequest) error {
 			return creator.Run(ctx, request.Target, request.Cache, request.Output)
 		},

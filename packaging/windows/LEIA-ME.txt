@@ -6,16 +6,24 @@ Para avaliar esta revisao, leia TESTE-WINDOWS.md antes de preparar o pendrive.
 BUILD-INFO.txt identifica a versao e o commit; registre os resultados em RESULTADOS-VALIDACAO.md.
 Um pacote de teste da CI ainda depende da validacao pratica com NVDA.
 
-PRIMEIRO USO
+PREPARAR NA MESMA JANELA
 
-1. Conecte o pendrive.
-2. Abra INICIAR-AQUI.cmd.
-3. O programa mostrara a letra, o nome, o tamanho e a situacao dos pendrives encontrados.
-4. Confirme o nome e o tamanho antes de usar a letra indicada.
+1. Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executavel sem argumentos tambem inicia o assistente.
+2. O assistente mostra nome, letra, tamanho, espaco livre e situacao das unidades. Confira essas informacoes e digite o numero da unidade desejada. Mesmo com apenas uma unidade, voce precisa escolhe-la.
+3. Use R para atualizar a lista depois de conectar ou reconectar uma unidade. Use 0 para sair.
+4. Leia o plano com as ferramentas, versoes e links das licencas. Digite ACEITO para aceitar as licencas e SIM para confirmar o destino quando solicitado. Sem as duas confirmacoes, a preparacao nao comeca.
+5. Acompanhe o download, a preparacao e a verificacao na mesma janela. Nao e preciso fechar a janela para copiar comandos para outro terminal.
+6. Ao concluir, escolha 1 para abrir a pasta do ambiente no Explorador de Arquivos, 2 para preparar outro pendrive ou 0 para sair. Na pasta do ambiente, abra START.cmd quando quiser iniciar NVDA e VS Code. O assistente nao inicia esses aplicativos automaticamente. As mensagens de erro e as opcoes para continuar tambem ficam na mesma janela.
 
-O programa nao formata, nao particiona e nao escolhe um pendrive automaticamente.
+Se a unidade escolhida ja tiver uma instalacao, o assistente oferece verifica-la. Digite SIM para verificar sem preparar novamente ou sobrescrever arquivos. Apos verificar com sucesso, o menu final continua disponivel na mesma janela.
 
-USO PELA LINHA DE COMANDO
+O programa nao formata, nao particiona, nao escolhe um pendrive automaticamente e nao sobrescreve um ambiente existente. Se o pendrive nao atender aos requisitos, leia o motivo e escolha outra unidade ou atualize a lista. Nao formate uma unidade apenas para contornar um erro sem antes preservar seus arquivos.
+
+Preparacao e verificacao concluidas significam que o ambiente foi criado e passou pela verificacao estrutural. Isso nao aprova sua acessibilidade. Siga TESTE-WINDOWS.md e VALIDACAO.md com NVDA. A instalacao das extensoes Python continua opcional, conforme EXTENSOES-PYTHON.md.
+
+LINHA DE COMANDO OPCIONAL
+
+Os comandos continuam disponiveis para automacao e diagnostico. No PowerShell, na pasta do programa:
 
 Procurar pendrives:
   .\blind-dev-setup-windows-x64.exe list-targets
@@ -28,6 +36,8 @@ Preparar depois de conferir o plano e as licencas:
 
 Verificar um ambiente preparado:
   .\blind-dev-setup-windows-x64.exe verify --target E:\
+
+Troque E: pela letra conferida para o seu pendrive. O assistente usa as mesmas protecoes desses comandos.
 
 Projeto e atualizacoes:
   https://github.com/woliveiras/blind-dev-setup

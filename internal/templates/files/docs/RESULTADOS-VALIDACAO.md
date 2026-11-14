@@ -25,6 +25,13 @@ Copie este arquivo para registrar uma sessão. Preencha `passou`, `falhou` ou `n
 | Etapa | Resultado | Observado / evidência |
 | --- | --- | --- |
 | Descoberta do USB e plano | não executado | |
+| Assistente abre diretamente pelo executável | não executado | |
+| Escolha explícita do pendrive, inclusive quando há só um | não executado | |
+| Atualizar lista e corrigir escolha sem fechar a janela | não executado | |
+| Cancelar antes do aceite sem alterar o pendrive | não executado | |
+| Ler licenças, aceitar e confirmar destino na mesma janela | não executado | |
+| Recuperação de erro e verificação de instalação existente | não executado | |
+| Menu final: abrir pasta, escolher outro pendrive e sair | não executado | |
 | Prepare e arquivos pessoais preservados | não executado | |
 | Verify | não executado | |
 | START.cmd como primeira entrada | não executado | |

@@ -26,6 +26,9 @@ func TestReadmeStartsUsersWithPrebuiltDownloads(t *testing.T) {
 		"INICIAR-AQUI.cmd",
 		"não precisa instalar Go",
 		"não possui assinatura digital",
+		"### Assistente na mesma janela",
+		"sem argumentos",
+		"### Linha de comando opcional",
 	} {
 		if !strings.Contains(readme, required) {
 			t.Errorf("README does not contain %q", required)

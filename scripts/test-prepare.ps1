@@ -41,6 +41,28 @@ function Invoke-Checked {
     }
 }
 
+function Invoke-Wizard {
+    param(
+        [string]$FilePath,
+        [string[]]$ArgumentList = @(),
+        [AllowEmptyCollection()]
+        [string[]]$Answers = @()
+    )
+
+    # Send real prompt responses through stdin. Preserve the live job log while
+    # collecting a transcript so exit code zero alone cannot pass this test.
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $Answers | & $FilePath @ArgumentList 2>&1 | ForEach-Object {
+        $line = [string]$_
+        $lines.Add($line)
+        Write-Host $line
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Wizard failed with exit code $LASTEXITCODE."
+    }
+    return ($lines -join [Environment]::NewLine)
+}
+
 if ($Cleanup) {
     Remove-TestVolume
     return
@@ -91,19 +113,51 @@ exit
     }
     Write-Host "Testing prepare on $target ($($volume.SizeRemaining) bytes free)."
     $cache = Join-Path $WorkDirectory "downloads"
-    Invoke-Checked -FilePath $executable -ArgumentList @("plan", "--target", $target)
-    Invoke-Checked -FilePath $executable -ArgumentList @(
-        "prepare", "--target", $target, "--cache", $cache, "--accept-licenses"
+    $bundleRoot = Join-Path $target "blind-dev-setup"
+    $sentinel = Join-Path $target "preserve-existing-file.txt"
+    $sentinelContent = "Wizard must preserve existing files."
+    Set-Content -LiteralPath $sentinel -Value $sentinelContent -Encoding ascii
+
+    # The ordinary no-argument executable must accept cancellation without
+    # writing. The VHD is not USB, so an explicit target is used for installation.
+    $null = Invoke-Wizard -FilePath $executable -Answers @("0")
+    $wizardArguments = @("wizard", "--target", $target, "--cache", $cache)
+    # EOF after target selection cannot act as license acceptance/confirmation.
+    $null = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers @("1")
+    if ((Test-Path -LiteralPath $bundleRoot) -or (Test-Path -LiteralPath $cache) -or
+        @(Get-ChildItem -LiteralPath $target -Force -Filter ".blind-dev-setup-staging-*").Count -ne 0) {
+        throw "Cancelled wizard wrote an installation, staging directory or cache."
+    }
+    if ((Get-Content -LiteralPath $sentinel -Raw).Trim() -ne $sentinelContent) {
+        throw "Cancelled wizard modified an existing file."
+    }
+
+    # Exercise target choice, license acceptance, destination confirmation,
+    # real preparation, automatic verification, and exit in one process/window.
+    $transcript = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers @(
+        "1", "ACEITO", "SIM", "0"
     )
+    if (-not $transcript.Contains("Preparação e verificação concluídas.")) {
+        throw "Wizard did not report completion of preparation and verification."
+    }
+    if ((Get-Content -LiteralPath $sentinel -Raw).Trim() -ne $sentinelContent) {
+        throw "Wizard modified an existing file while preparing the environment."
+    }
     Invoke-Checked -FilePath $executable -ArgumentList @("verify", "--target", $target)
 
-    $bundleRoot = Join-Path $target "blind-dev-setup"
     if (-not (Test-Path -LiteralPath (Join-Path $bundleRoot "READY.txt") -PathType Leaf)) {
         throw "prepare did not publish READY.txt."
     }
     $staging = @(Get-ChildItem -LiteralPath $target -Force -Filter ".blind-dev-setup-staging-*")
     if ($staging.Count -ne 0) {
         throw "prepare left staging directories behind."
+    }
+    # Selecting an existing environment must offer verification, not overwrite it.
+    $existingTranscript = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers @(
+        "1", "SIM", "0"
+    )
+    if (-not $existingTranscript.Contains("Verificação concluída.")) {
+        throw "Wizard did not verify the existing environment."
     }
 
     # Test ordinary PATH resolution, without mise exec or the runner's tools.
@@ -221,7 +275,7 @@ if ($RunExamples) {
         Move-Item -LiteralPath $nodeBackup -Destination $nodeExecutable
     }
     Invoke-Checked -FilePath $executable -ArgumentList @("verify", "--target", $target)
-    Write-Host "prepare, verify, PATH commands, drive-letter change and rejection checks passed."
+    Write-Host "Wizard preparation, verify, PATH commands, drive-letter change and rejection checks passed."
 }
 finally {
     Remove-TestVolume
