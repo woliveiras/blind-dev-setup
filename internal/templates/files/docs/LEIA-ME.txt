@@ -1,41 +1,24 @@
 BLIND-DEV-SETUP
 
-A versão deste ambiente está em READY.txt e config/manifest.json.
-
-Este ambiente foi preparado para Windows 11 x64.
-
-Para preparar o pendrive, abra blind-dev-setup-windows-x64.exe diretamente, sem argumentos. Se baixou o ZIP do gerador, extraia o pacote antes de abrir o executável. Na pergunta inicial, Enter ou 1 escolhe a opção com leitor de tela/NVDA; 2 escolhe a opção sem leitor de tela. Não é preciso conhecer comandos para escolher. Essa opção adapta a interface e não inicia NVDA; use o leitor que já estiver disponível durante a preparação.
-
-As cinco etapas são escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Detalhes extensos e saída técnica ficam separados das perguntas; consulte a opção de detalhes ou o log informado se houver uma falha. Depois da verificação bem-sucedida, escolha Iniciar ambiente (I no modo com leitor de tela) para iniciar NVDA Portable e VS Code pelo fluxo de START.cmd. O menu permanece disponível. As opções 1 para abrir a pasta, 2 para outro pendrive, D para detalhes e 0 para sair continuam disponíveis. Abrir a pasta não inicia aplicativos; use START.cmd quando desejar iniciá-los depois.
-
-Conclusão do assistente e uso do modo com leitor de tela não substituem validação prática com pessoas cegas usando teclado e NVDA.
+Ambiente portatil para Windows 11 x64.
+A versao deste ambiente esta em READY.txt e config/manifest.json.
 
 INICIO RAPIDO
 
-1. Escolha Iniciar ambiente no menu final do assistente ou abra START.cmd no pendrive para iniciar NVDA Portable e Visual Studio Code.
-2. Abra DEV-SHELL.cmd para usar Python, Node.js, Git, uv e pnpm.
-3. Salve seus projetos dentro da pasta workspace.
-4. Leia NVDA.md antes de personalizar fala, símbolos ou add-ons.
-5. Leia PYTHON-COM-UV.md e EXTENSOES-PYTHON.md para preparar a edição e depuração Python. As extensões são opcionais e exigem sua escolha.
-6. Execute TESTE-WINDOWS.md e VALIDACAO.md antes de depender do ambiente para trabalho. Registre os resultados em uma cópia de RESULTADOS-VALIDACAO.md.
+Para preparar um pendrive, abra blind-dev-setup-windows-x64.exe diretamente.
+Depois da preparacao, escolha Iniciar ambiente no assistente ou abra START.cmd no pendrive para iniciar NVDA Portable e VS Code.
+DEV-SHELL.cmd abre o terminal portatil. Salve seus projetos em workspace\projects.
 
-OUTROS INICIALIZADORES
+GUIA DE USO
 
-- START-NVDA.cmd inicia apenas o NVDA.
-- START-VSCODE.cmd inicia apenas o VS Code.
-- START-NOTEPADPP.cmd inicia o editor auxiliar Notepad++.
-- START-DBEAVER.cmd inicia o DBeaver com os dados no pendrive.
+https://github.com/woliveiras/blind-dev-setup/wiki
 
-LIMITES IMPORTANTES
+Uso diario: https://github.com/woliveiras/blind-dev-setup/wiki/Uso-diario
+Python: https://github.com/woliveiras/blind-dev-setup/wiki/Python-com-uv
+Node.js: https://github.com/woliveiras/blind-dev-setup/wiki/Nodejs-com-pnpm
+NVDA: https://github.com/woliveiras/blind-dev-setup/wiki/NVDA-e-acessibilidade
+Ajuda: https://github.com/woliveiras/blind-dev-setup/wiki/Solucao-de-problemas
+Validacao: https://github.com/woliveiras/blind-dev-setup/wiki/Teste-no-Windows
 
-O NVDA Portable não lê a tela de login, telas UAC nem aplicativos executados como administrador. Não execute editores ou terminais como administrador. Se esses fluxos forem necessários, use uma instalação permanente do NVDA no computador.
-
-DBeaver é experimental neste projeto até que seus fluxos sejam validados por pessoas cegas com NVDA.
-
-O ambiente não contém senhas, tokens, chaves SSH ou identidade Git. Configure apenas o que você decidir levar no pendrive e proteja fisicamente a unidade.
-
-Se a letra do pendrive mudar, os projetos continuam sendo a fonte de verdade. Ambientes .venv e node_modules podem precisar ser recriados a partir de pyproject.toml, uv.lock, package.json e pnpm-lock.yaml.
-
-DIAGNOSTICO
-
-verify confere estrutura e configurações; ele não executa os programas nem comprova acessibilidade ou a integridade completa dos aplicativos de terceiros. Os launchers de desenvolvimento conferem as configurações gerenciadas do mise antes de autorizá-las. Se houver divergência, registre o erro e preserve seus projetos; não contorne a verificação.
+Os guias completos ficam na Wiki e exigem internet. Salve uma copia para consultar sem conexao.
+Os avisos de licenca permanecem incluidos neste ambiente.

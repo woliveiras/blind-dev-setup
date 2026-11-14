@@ -4,6 +4,32 @@
 
 Leia o ADR, o manifesto e os limites de evidência. Não trate a presença de arquivos, testes ou configurações como prova de acessibilidade real.
 
+## Compilar o projeto
+
+Esta seção é somente para desenvolvimento. Usuários podem utilizar o [download pronto](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe).
+
+Requisitos para compilar:
+
+- Go 1.27.4 ou posterior;
+- Git;
+- Windows 11 x64 para executar `prepare`.
+
+No PowerShell:
+
+```powershell
+go test ./...
+go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+```
+
+Em macOS ou Linux é possível testar e gerar o executável Windows:
+
+```bash
+go test ./...
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -o blind-dev-setup-windows-x64.exe ./cmd/blind-dev-setup
+```
+
+O script `scripts/build.ps1` executa testes e análise estática, cria o executável e o ZIP em `dist` e gera `SHA256SUMS.txt`.
+
 ## Fluxo local
 
     gofmt -w cmd internal
@@ -21,7 +47,7 @@ O job Windows da CI executa o assistente do binário real com `wizard --accessib
 
 Antes da instalação, o teste executa o programa sem argumentos com entrada redirecionada, que usa o modo com leitor de tela, e responde `0` para cancelar. Com `--accessible` explícito, também cancela na seleção, antes do aceite das licenças e antes da confirmação do destino. Encerra a entrada (EOF) antes de cada consentimento para comprovar que o fim da entrada não autoriza a instalação. Cada saída é verificada separadamente e não pode criar ambiente, staging ou cache. Um arquivo já existente no volume deve permanecer intacto tanto após o cancelamento quanto depois da preparação. Após a instalação, uma nova sessão do assistente seleciona o ambiente existente e confirma apenas sua verificação. O argumento `wizard --accessible --target` identifica explicitamente o volume de teste, que não é USB; a inspeção do destino e as confirmações continuam obrigatórias, sem opções que aceitem os prompts automaticamente.
 
-Depois da publicação, o teste inicializa o ambiente pelo helper compartilhado `config/initialize-toolchain.cmd` e executa Python, Node.js, uv e pnpm diretamente pelo `PATH`, conferindo origem e versões. O `PATH` inicial contém apenas diretórios do Windows, para impedir que ferramentas instaladas no runner escondam dependências ausentes. O teste confere também a origem de Git pelo PATH, sua versão e a execução de um comando pelo Bash portátil. Isso exercita a extração silenciosa do Git e sua etapa de pós-instalação. A extração usa o helper oficial 7zr.exe do 7-Zip, baixado com versão, tamanho e SHA-256 fixados no manifesto antes do Git. A licença e a fonte correspondente ficam documentadas em docs/FONTES-E-LICENCAS.md e docs/LICENSE-7ZIP.txt do ambiente gerado. Não se depende do tar.exe do Windows para extrair o pacote do Git. O teste muda a letra do volume e repete a verificação e a execução dos comandos.
+Depois da publicação, o teste inicializa o ambiente pelo helper compartilhado `config/initialize-toolchain.cmd` e executa Python, Node.js, uv e pnpm diretamente pelo `PATH`, conferindo origem e versões. O `PATH` inicial contém apenas diretórios do Windows, para impedir que ferramentas instaladas no runner escondam dependências ausentes. O teste confere também a origem de Git pelo PATH, sua versão e a execução de um comando pelo Bash portátil. Isso exercita a extração silenciosa do Git e sua etapa de pós-instalação. A extração usa o helper oficial 7zr.exe do 7-Zip, baixado com versão, tamanho e SHA-256 fixados no manifesto antes do Git. A licença e a fonte correspondente ficam documentadas em [Wiki de fontes e licenças](https://github.com/woliveiras/blind-dev-setup/wiki/Fontes-e-licencas) e em docs/LICENSE-7ZIP.txt do ambiente gerado. Não se depende do tar.exe do Windows para extrair o pacote do Git. O teste muda a letra do volume e repete a verificação e a execução dos comandos.
 
 O teste também altera temporariamente `mise.toml` para comprovar que o helper recusa uma configuração modificada antes de confiar nela, e retira `node.exe` de sua pasta para comprovar que `verify` detecta um toolchain incompleto. Ambos os arquivos são restaurados em `finally`, e os comandos são verificados novamente depois da restauração.
 
@@ -76,4 +102,19 @@ A CLI não interativa e o modo com leitor de tela devem continuar lineares, sem 
 
 Teste os dois modos: o modo com leitor de tela com respostas redirecionadas cobre funcionamento, EOF e consentimento; ele não comprova foco, anúncios ou navegação com um leitor de tela real. Mudanças de transcrição precisam atualizar scripts/test-prepare.ps1. Preferências de fala e add-ons do NVDA permanecem opt-in.
 
-Mudanças no fluxo principal precisam executar docs/VALIDACAO.md no ambiente gerado. Registre resultados e limitações observadas, sem identificar participantes.
+Mudanças no fluxo principal precisam seguir o [protocolo de validação com NVDA](https://github.com/woliveiras/blind-dev-setup/wiki/Validacao-com-NVDA) no ambiente gerado. Registre resultados e limitações observadas, sem identificar participantes.
+
+## Documentação de uso
+
+A [Wiki](https://github.com/woliveiras/blind-dev-setup/wiki) é a fonte dos manuais para usuários. Edite as páginas nela; evite copiar os guias completos para o README ou para os templates. Os arquivos em `internal/templates/files/docs` e o `LEIA-ME.txt` do pacote contêm links para a Wiki. Os avisos legais permanecem incluídos na distribuição.
+
+Os nomes desses arquivos são preservados para que os links de pacotes e as mensagens de diagnóstico continuem funcionando. Os guias completos exigem internet ou uma cópia salva pelo usuário. A ficha de validação deve ser copiada da Wiki para preenchimento local.
+
+Para editar a Wiki pelo terminal, clone seu repositório separado:
+
+```bash
+git clone git@github.com:woliveiras/blind-dev-setup.wiki.git
+cd blind-dev-setup.wiki
+```
+
+Edite as páginas Markdown, confira os links e o menu `_Sidebar.md`, faça commit e publique com `git push`. Alterações na Wiki não publicam uma release do programa. Mantenha os downloads no formato `releases/latest/download/blind-dev-setup-windows-x64.exe`, sem fixar a versão.

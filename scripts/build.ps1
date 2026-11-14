@@ -45,7 +45,7 @@ Copy-Item (Join-Path $packagingDirectory "INICIAR-AQUI.cmd") $packageDirectory
 Copy-Item (Join-Path $packagingDirectory "LEIA-ME.txt") $packageDirectory
 Copy-Item (Join-Path $projectRoot "LICENSE") $packageDirectory
 Copy-Item (Join-Path $projectRoot "internal\notices\THIRD-PARTY-NOTICES.txt") $packageDirectory
-# Keep the manual test guide's relative links usable before preparing a drive.
+# Include Wiki pointers so users can find the guides before preparing a drive.
 Copy-Item (Join-Path $projectRoot "internal\templates\files\docs\*.md") $packageDirectory
 Copy-Item (Join-Path $projectRoot "internal\templates\files\docs\LICENSE-7ZIP.txt") $packageDirectory
 $sourceCommit = (& git rev-parse HEAD)

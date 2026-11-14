@@ -9,7 +9,7 @@ import (
 func TestReadmeStartsUsersWithPrebuiltDownloads(t *testing.T) {
 	readme := readFile(t, filepath.Join(projectRoot(t), "README.md"))
 	downloadHeading := strings.Index(readme, "## Baixar e usar")
-	buildHeading := strings.Index(readme, "## Compilar o projeto")
+	buildHeading := strings.Index(readme, "## Desenvolvimento")
 	if downloadHeading < 0 {
 		t.Fatal("README does not contain the prebuilt download section")
 	}
@@ -21,16 +21,15 @@ func TestReadmeStartsUsersWithPrebuiltDownloads(t *testing.T) {
 		"https://github.com/woliveiras/blind-dev-setup/releases/latest",
 		"https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe",
 		"https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.zip",
-		"curl.exe -fL",
-		"wget --https-only",
-		"abra `blind-dev-setup-windows-x64.exe`",
+		"https://github.com/woliveiras/blind-dev-setup/releases/latest/download/SHA256SUMS.txt",
+		"https://github.com/woliveiras/blind-dev-setup/wiki",
+		"https://github.com/woliveiras/blind-dev-setup/wiki/Primeiros-passos",
+		"https://github.com/woliveiras/blind-dev-setup/wiki/Linha-de-comando",
+		"Abra `blind-dev-setup-windows-x64.exe`",
 		"não precisa instalar Go",
 		"não possui assinatura digital",
-		"### Assistente na mesma janela",
 		"sem argumentos",
-		"### Linha de comando opcional",
-		"wizard --accessible",
-		"wizard --visual",
+		"CONTRIBUTING.md",
 	} {
 		if !strings.Contains(readme, required) {
 			t.Errorf("README does not contain %q", required)

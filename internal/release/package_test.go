@@ -42,7 +42,7 @@ func TestWindowsBuildCreatesCompletePortableRelease(t *testing.T) {
 	}
 
 	guide := readFile(t, filepath.Join(root, "packaging", "windows", "LEIA-ME.txt"))
-	for _, required := range []string{"abra blind-dev-setup-windows-x64.exe diretamente", "list-targets", "nao formata"} {
+	for _, required := range []string{"abra blind-dev-setup-windows-x64.exe diretamente", "https://github.com/woliveiras/blind-dev-setup/wiki", "nao formata"} {
 		if !strings.Contains(guide, required) {
 			t.Errorf("packaged guide does not contain %q", required)
 		}
