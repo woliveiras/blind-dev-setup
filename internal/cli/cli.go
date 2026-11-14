@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/woliveiras/blind-dev-setup/internal/manifest"
+	"github.com/woliveiras/blind-dev-setup/internal/notices"
+	"github.com/woliveiras/blind-dev-setup/internal/progress"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
 )
 
@@ -15,6 +17,7 @@ type PrepareRequest struct {
 	Target string
 	Cache  string
 	Output io.Writer
+	Report func(progress.Event)
 }
 
 type Dependencies struct {
@@ -41,6 +44,9 @@ func Run(args []string, stdout, stderr io.Writer, dependencies Dependencies) int
 		return 0
 	case "version":
 		fmt.Fprintf(stdout, "blind-dev-setup %s\n", dependencies.Manifest.Release)
+		return 0
+	case "licenses":
+		fmt.Fprint(stdout, notices.Text)
 		return 0
 	case "list-targets":
 		return runListTargets(stdout, stderr, dependencies)
@@ -262,6 +268,7 @@ func printUsage(output io.Writer) {
 		`  .\blind-dev-setup-windows-x64.exe list-targets`,
 		"",
 		"Comandos:",
+		"  licenses mostra as licenças das bibliotecas deste executável",
 		"  wizard   prepara o pendrive nesta janela, com escolhas e confirmações",
 		"  list-targets  procura pendrives e mostra qual letra usar",
 		"  plan     mostra componentes, licenças e ações sem escrever",

@@ -5,9 +5,9 @@ O estado de uma release deve ser conferido pelo pacote, seu BUILD-INFO.txt e pel
 ## Implementado para Windows 11 x64
 
 - Descoberta de volumes USB, destino explícito e preparação de ambiente novo em NTFS, sem formatação pelo gerador.
-- Assistente na mesma janela para selecionar a unidade, ler o plano/licenças, confirmar, preparar, verificar e escolher abrir a pasta do ambiente, preparar outra unidade ou sair. Os comandos não interativos continuam disponíveis.
+- Assistente huh em cinco etapas na mesma janela, com modos visual e acessível escolhidos sem CLI: escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Detalhes e log técnico ficam separados das perguntas; os comandos não interativos continuam disponíveis.
 - Download de artefatos oficiais fixados, conferência de tamanho/SHA-256, montagem temporária e publicação da pasta final.
-- Git, VS Code, NVDA, Notepad++, DBeaver e mise portáteis; Python, Node.js, uv e pnpm fixados.
+- Git, VS Code, NVDA, Notepad++, DBeaver e mise portáteis, com helper 7-Zip fixado para extração silenciosa; Python, Node.js, uv e pnpm fixados.
 - Verificação estrutural de executáveis e configurações gerenciadas, sem executar aplicativos.
 - Inicialização compartilhada do ambiente nos launchers de desenvolvimento e conferência da configuração do mise antes de autorizar o caminho atual.
 - Exemplo Python com configuração de depuração, instalação opcional de extensões e guias de teste e registro de resultados.
@@ -17,7 +17,7 @@ O estado de uma release deve ser conferido pelo pacote, seu BUILD-INFO.txt e pel
 
 - [x] CI de integração aprovada: [77cc506](https://github.com/woliveiras/blind-dev-setup/actions/runs/43607297298), com prepare, verify, ferramentas pelo PATH, exemplos, mudança da letra e limpeza. Para cada pacote posterior, exigir aprovação da revisão exata entregue.
 - [x] Pacote de teste com checksum, commit e estado das fontes identificados, conferidos antes do upload pela CI.
-- [ ] Teste em notebook Windows 11 x64, como usuário padrão, usando pendrive real: assistente completo na mesma janela, seleção explícita mesmo com uma unidade, atualização da lista, cancelamento, recuperação de erro, preparação, launchers independentes, exemplos e recusas sem alteração de dados.
+- [ ] Teste em notebook Windows 11 x64, como usuário padrão, usando pendrive real: assistente completo nos modos acessível e visual, escolha do modo sem CLI, seleção explícita mesmo com uma unidade, detalhes/logs, atualização, cancelamento, recuperação de erro, preparação, launchers, exemplos e recusas sem alteração de dados.
 - [ ] Reconexão e mudança da letra, incluindo recriação de ambientes derivados quando necessária.
 - [ ] Versões das extensões Python registradas e diagnóstico/depuração aprovados na combinação testada.
 - [ ] Protocolo completo por teclado e NVDA com pessoas cegas, com resultados registrados; repetir em Windows limpo para comprovar o cenário sem ferramentas previamente instaladas.

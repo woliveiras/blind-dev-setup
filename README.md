@@ -1,10 +1,10 @@
 # blind-dev-setup
 
-Gerador de um ambiente de desenvolvimento portátil para pessoas cegas, com mensagens lineares e operação por teclado e leitor de tela.
+Gerador de um ambiente de desenvolvimento portátil para pessoas cegas, com assistente por teclado, modo visual e modo acessível de mensagens lineares para leitores de tela.
 
 A versão atual prepara um pendrive NTFS para Windows 11 x64 com:
 
-- Git for Windows Portable;
+- Git for Windows Portable, extraído com um helper oficial do 7-Zip verificado;
 - Visual Studio Code Portable como editor principal;
 - NVDA Portable;
 - Notepad++ Portable como editor auxiliar;
@@ -70,17 +70,23 @@ O executável atual não possui assinatura digital. Por isso, o Windows pode apr
 
 ### Assistente na mesma janela
 
-Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. O assistente apresenta mensagens lineares e aceita respostas pelo teclado:
+Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. Na pergunta inicial, pressione Enter ou `1` para usar o modo acessível para NVDA, `2` para o modo visual ou `0` para sair. Você não precisa conhecer comandos para escolher o modo.
 
-1. Confira nome, letra, tamanho, espaço livre e situação de cada unidade; digite o número da unidade desejada. A escolha é explícita mesmo quando só há um pendrive.
-2. Use `R` para atualizar a lista ou `0` para sair. Se houver um impedimento, leia o motivo e permaneça no assistente para escolher outra unidade ou atualizar a lista.
-3. Leia o plano com ferramentas, versões e links das licenças. Digite `ACEITO` para aceitar as licenças e `SIM` para confirmar o destino quando solicitado. A preparação só começa após essas confirmações.
-4. Acompanhe downloads, preparação e verificação na mesma janela. Em caso de falha, leia a mensagem e escolha uma das opções de recuperação apresentadas.
-5. No menu final, escolha `1` para abrir a pasta do ambiente no Explorador de Arquivos, `2` para preparar outro pendrive ou `0` para sair. Na pasta do ambiente, abra `START.cmd` para iniciar NVDA e VS Code quando desejar; esses aplicativos não são iniciados automaticamente pelo assistente.
+O assistente tem cinco etapas:
 
-Se a unidade escolhida já tiver uma instalação, o assistente oferece verificá-la: confirme com `SIM` para executar a verificação e chegar ao menu final, sem preparar novamente nem sobrescrever arquivos.
+1. **Escolher pendrive:** confira nome, letra, capacidade e espaço livre. Escolha explicitamente a unidade, mesmo quando houver apenas uma.
+2. **Revisar aplicativos e licenças:** leia o resumo e abra os detalhes quando desejar consultar a lista completa, versões e links. Aceite as licenças somente se concordar.
+3. **Confirmar destino:** confira a unidade novamente e confirme a preparação. Nada é instalado sem aceite e confirmação.
+4. **Preparar e verificar:** acompanhe as mensagens curtas de progresso. A saída técnica dos instaladores fica separada no log; a opção de detalhes mostra seu caminho depois da operação.
+5. **Concluir:** escolha abrir a pasta do ambiente no Explorador, preparar outro pendrive ou sair. Para iniciar NVDA e VS Code, abra `START.cmd` na pasta preparada; eles não abrem automaticamente.
 
-Você não precisa fechar o assistente e abrir outro terminal para preparar o pendrive. O programa continua sem formatar ou sobrescrever ambientes existentes. A conclusão confirma preparação e verificação estrutural; a avaliação de uso por teclado e NVDA ainda exige o protocolo prático. As extensões Python permanecem opcionais e têm um guia próprio.
+No modo acessível, as opções são anunciadas em texto e respondidas com Enter: `R` atualiza os destinos, `0` sai, `D` abre detalhes quando oferecido, `ACEITO` aceita as licenças e `SIM` confirma o destino. O modo visual usa formulários por teclado; siga as opções e teclas indicadas na tela. Os dois modos mantêm as mesmas confirmações e proteções.
+
+Se a unidade já tiver uma instalação, o assistente oferece verificá-la, sem preparar novamente nem sobrescrever. Na conclusão ou em caso de falha, a opção de detalhes mostra um trecho do log e permite continuar na mesma janela. O resumo não mistura a saída extensa de downloads e instaladores com as perguntas.
+
+A conclusão confirma preparação e verificação estrutural. A avaliação de uso com NVDA ainda exige o protocolo prático; o nome “modo acessível” descreve o formato de interação, não uma aprovação empírica. As extensões Python permanecem opcionais e têm um guia próprio.
+
+Para selecionar um modo diretamente ao iniciar pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo acessível. Os comandos de automação abaixo continuam disponíveis.
 
 ### Linha de comando opcional
 
@@ -134,7 +140,7 @@ Esta seção é somente para desenvolvimento. Usuários podem utilizar os downlo
 
 Requisitos para compilar:
 
-- Go 1.25 ou posterior;
+- Go 1.27.4 ou posterior;
 - Git;
 - Windows 11 x64 para executar `prepare`.
 

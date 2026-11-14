@@ -13,18 +13,23 @@ Use este roteiro com o pacote da revisão que será avaliada. O ZIP de teste inc
 
 Não execute `scripts/test-prepare.ps1` para este teste manual: esse script é destinado à CI e cria um disco virtual com privilégios administrativos.
 
-## A. Descoberta e preparação na mesma janela
+## A. Cinco etapas na mesma janela
 
-1. Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executável sem argumentos também deve iniciar o assistente.
-2. Confira nome, letra, tamanho, espaço livre e NTFS. A capacidade em GiB pode ser menor que o valor comercial em GB, por exemplo 29,7 GiB em um pendrive vendido como 32 GB; o requisito efetivo é ter pelo menos 12 GiB livres.
-3. Confira que nenhuma unidade foi selecionada automaticamente, mesmo quando há apenas uma. Use `R` para atualizar a lista; depois digite o número correspondente ao pendrive conferido.
-4. Leia o plano com os aplicativos, versões e links de licenças. Digite `ACEITO` somente se concordar com as licenças e `SIM` para confirmar o destino quando solicitado.
-5. Acompanhe a preparação e a verificação até o fim, na mesma janela. Não é preciso abrir outro terminal ou copiar um comando para continuar.
-6. Confira o menu de conclusão: `1` abre a pasta do ambiente no Explorador de Arquivos, `2` permite preparar outro pendrive e `0` sai. Escolha `1` e confirme que a pasta correta abriu, sem iniciar NVDA ou VS Code automaticamente. A opção `2` deve voltar à escolha explícita; `0` deve encerrar sem uma segunda pausa do inicializador.
+Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executável sem argumentos também deve iniciar o assistente. Na pergunta inicial, use Enter ou `1` para o modo acessível para NVDA, `2` para o visual ou `0` para sair. Registre se essa primeira escolha foi lida e pôde ser respondida sem outro terminal.
 
-Esperado: nenhum arquivo pessoal alterado, pasta final `blind-dev-setup` na unidade selecionada, marcador `READY.txt` e verificação concluída antes do menu de sucesso. Registre a saída integral em caso de falha, removendo nomes pessoais antes de compartilhá-la. Os erros e as opções para continuar devem permanecer na mesma janela; uma falha não pode aparecer como preparação concluída.
+Faça o primeiro teste no modo acessível e registre os cinco passos:
 
-A verificação é estrutural e de configurações; ela não substitui os testes de execução e acessibilidade a seguir nem prova a integridade completa de todos os arquivos de terceiros. As extensões Python continuam opcionais e são instaladas pelo guia correspondente.
+1. **Escolher pendrive:** confira nome, letra, tamanho, espaço livre e NTFS. Digite o número da unidade conferida; mesmo uma unidade única exige escolha. `R` atualiza a lista e `0` sai. Um pendrive de 32 GB pode aparecer com aproximadamente 29,7 GiB; o requisito efetivo é ter 12 GiB livres.
+2. **Revisar aplicativos e licenças:** confira o resumo. Use `D` para abrir os detalhes oferecidos e localizar versões e links de licença. Depois volte ao fluxo e digite `ACEITO` somente se concordar.
+3. **Confirmar destino:** confira novamente a unidade e digite `SIM` somente para autorizar o destino escolhido.
+4. **Preparar e verificar:** acompanhe mensagens curtas de progresso. A saída técnica dos instaladores deve ficar no log, não misturada às perguntas. A janela deve permanecer utilizável pelo leitor de tela, sem depender de cor ou animação. Depois da conclusão ou de uma falha, consulte `D` e confira o trecho e o caminho do log.
+5. **Concluir:** confirme preparação e verificação, consulte `D` para detalhes quando oferecido e escolha abrir a pasta, preparar outro pendrive ou sair. No modo acessível, `1` abre a pasta, `2` volta à escolha e `0` sai. Abrir a pasta não deve iniciar NVDA ou VS Code automaticamente. Sair não deve apresentar uma segunda pausa do inicializador.
+
+Esperado: nenhum arquivo pessoal alterado, pasta final `blind-dev-setup` na unidade selecionada, marcador `READY.txt` e verificação concluída antes do menu de sucesso. Em caso de falha, consulte os detalhes e preserve o log indicado, removendo informações pessoais antes de compartilhar. O assistente deve permitir continuar na mesma janela, sem apresentar uma falha como sucesso.
+
+Repita a escolha de modo usando a opção visual, desta vez verificando a instalação já existente, sem nova etapa de licenças. Navegue pelos formulários usando as teclas indicadas e confirme que o texto dos controles e o foco permanecem compreensíveis. Registre esse resultado separadamente: o funcionamento do modo acessível não aprova o visual, nem o inverso.
+
+A verificação é estrutural e de configurações; ela não substitui os testes de execução e acessibilidade a seguir nem prova a integridade completa dos arquivos de terceiros. O nome “modo acessível” não significa validação empírica com NVDA. As extensões Python continuam opcionais.
 
 ## B. Primeira abertura e origem das ferramentas
 
@@ -63,10 +68,11 @@ O traceback com `--fail` no exemplo Python é intencional; sua presença e a pos
 
 ## D. Cancelamento, recusa e recuperação na mesma janela
 
-Antes de autorizar uma preparação, teste estas interações no assistente:
+Antes de autorizar uma preparação, teste estas interações no modo acessível; depois confira as ações equivalentes pelos controles do modo visual:
 
 - Informe uma opção inválida na lista: a mensagem deve explicar o problema e permitir responder novamente na mesma janela.
 - Use `R`: a lista deve ser atualizada sem fechar o programa.
+- Abra `D` na revisão: os detalhes devem mostrar aplicativos/licenças e devolver o controle à revisão, sem iniciar instalação.
 - Recuse o aceite das licenças e cancele a confirmação do destino, em tentativas separadas: nenhuma preparação pode começar.
 - Use `0` na seleção: o programa deve sair normalmente, sem uma segunda pergunta para fechar a janela.
 
@@ -78,7 +84,7 @@ Se houver uma falha de preparação, registre-a antes de escolher uma opção pa
 
 ### Diagnóstico opcional pela linha de comando
 
-O fluxo principal acima não exige comandos. Para conferir também a interface não interativa, abra o PowerShell na pasta do executável. Troque `E:\` pela letra conferida do pendrive e execute:
+O fluxo principal acima não exige comandos. Para iniciar um modo diretamente pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo acessível. Para conferir também a interface não interativa, abra o PowerShell na pasta do executável. Troque `E:\` pela letra conferida do pendrive e execute:
 
     .\blind-dev-setup-windows-x64.exe version
     .\blind-dev-setup-windows-x64.exe list-targets

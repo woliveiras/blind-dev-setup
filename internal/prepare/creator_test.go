@@ -6,27 +6,37 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/woliveiras/blind-dev-setup/internal/manifest"
+	"github.com/woliveiras/blind-dev-setup/internal/progress"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
 )
 
 type fakeFetcher struct {
-	path string
-	err  error
+	path   string
+	err    error
+	before func()
 }
 
 func (f fakeFetcher) Fetch(context.Context, manifest.Component, string) (string, error) {
+	if f.before != nil {
+		f.before()
+	}
 	return f.path, f.err
 }
 
 type fakeInstaller struct {
-	err error
+	err    error
+	before func()
 }
 
 func (f fakeInstaller) Install(_ context.Context, component manifest.Component, _, root string, _ io.Writer) error {
+	if f.before != nil {
+		f.before()
+	}
 	if f.err != nil {
 		return f.err
 	}
@@ -63,13 +73,22 @@ func TestCreatorPublishesOnlyCompletePreparation(t *testing.T) {
 	targetRoot := t.TempDir()
 	current := preparationManifest()
 	var output strings.Builder
+	var events []progress.Event
+	requireStage := func(want string) func() {
+		return func() {
+			if len(events) == 0 || events[len(events)-1].Stage != want {
+				t.Fatalf("operation began before its %s progress event: %v", want, events)
+			}
+		}
+	}
 	creator := Creator{
 		Manifest:     current,
 		ManifestJSON: []byte("{\"release\":\"0.1.0\"}"),
-		Fetch:        fakeFetcher{path: "artifact.zip"},
-		Install:      fakeInstaller{},
+		Fetch:        fakeFetcher{path: "artifact.zip", before: requireStage(progress.Download)},
+		Install:      fakeInstaller{before: requireStage(progress.Extract)},
 		Materialize:  fakeMaterializer{},
 		Toolchain:    fakeToolchain{},
+		Report:       func(event progress.Event) { events = append(events, event) },
 		Inspect: func(string) (target.Details, error) {
 			return target.Details{
 				Path:         targetRoot,
@@ -94,10 +113,21 @@ func TestCreatorPublishesOnlyCompletePreparation(t *testing.T) {
 	if !strings.Contains(output.String(), "Preparação concluída") {
 		t.Fatalf("output = %q", output.String())
 	}
+	wantEvents := []progress.Event{
+		{Stage: progress.Download, Component: "Editor", Index: 1, Total: 1},
+		{Stage: progress.Extract, Component: "Editor", Index: 1, Total: 1},
+		{Stage: progress.Configure},
+		{Stage: progress.Toolchain},
+		{Stage: progress.Publish},
+	}
+	if !reflect.DeepEqual(events, wantEvents) {
+		t.Fatalf("progress events = %+v, want %+v", events, wantEvents)
+	}
 }
 
 func TestCreatorCleansStagingAfterFailure(t *testing.T) {
 	targetRoot := t.TempDir()
+	var events []progress.Event
 	creator := Creator{
 		Manifest:     preparationManifest(),
 		ManifestJSON: []byte("{}"),
@@ -105,6 +135,7 @@ func TestCreatorCleansStagingAfterFailure(t *testing.T) {
 		Install:      fakeInstaller{},
 		Materialize:  fakeMaterializer{},
 		Toolchain:    fakeToolchain{},
+		Report:       func(event progress.Event) { events = append(events, event) },
 		Inspect: func(string) (target.Details, error) {
 			return target.Details{
 				Path:         targetRoot,
@@ -126,6 +157,9 @@ func TestCreatorCleansStagingAfterFailure(t *testing.T) {
 	}
 	if len(entries) != 0 {
 		t.Fatalf("target contains incomplete preparation: %v", entries)
+	}
+	if len(events) != 1 || events[0].Stage != progress.Download {
+		t.Fatalf("reported progress past the failed download: %+v", events)
 	}
 }
 

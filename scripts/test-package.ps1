@@ -34,7 +34,7 @@ foreach ($fileName in @($binaryName, $archiveName)) {
 $unpacked = Join-Path ([System.IO.Path]::GetTempPath()) ("blind-dev-package-" + [guid]::NewGuid().ToString("N"))
 try {
     Expand-Archive -LiteralPath (Join-Path $PackageDirectory $archiveName) -DestinationPath $unpacked
-    foreach ($fileName in @($binaryName, "BUILD-INFO.txt", "TESTE-WINDOWS.md", "RESULTADOS-VALIDACAO.md", "INICIAR-AQUI.cmd", "LEIA-ME.txt", "LICENSE")) {
+    foreach ($fileName in @($binaryName, "BUILD-INFO.txt", "TESTE-WINDOWS.md", "RESULTADOS-VALIDACAO.md", "INICIAR-AQUI.cmd", "LEIA-ME.txt", "LICENSE", "THIRD-PARTY-NOTICES.txt")) {
         $path = Join-Path $unpacked $fileName
         if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or (Get-Item -LiteralPath $path).Length -eq 0) {
             throw "Package is missing a nonempty $fileName."
@@ -43,6 +43,12 @@ try {
     $packagedHash = (Get-FileHash -LiteralPath (Join-Path $unpacked $binaryName) -Algorithm SHA256).Hash
     if ($packagedHash -ne $checksums[$binaryName]) {
         throw "ZIP executable differs from the executable tested by CI."
+    }
+    $embeddedNotices = (& (Join-Path $unpacked $binaryName) licenses | Out-String)
+    if ($LASTEXITCODE -ne 0) { throw "Embedded license notices could not be read." }
+    $packagedNotices = Get-Content -LiteralPath (Join-Path $unpacked "THIRD-PARTY-NOTICES.txt") -Raw
+    if ($embeddedNotices.Replace("`r`n", "`n").Trim() -cne $packagedNotices.Replace("`r`n", "`n").Trim()) {
+        throw "Packaged license notices differ from the executable."
     }
     $buildInfo = Get-Content -LiteralPath (Join-Path $unpacked "BUILD-INFO.txt")
     $manifest = Get-Content -LiteralPath (Join-Path (Split-Path -Parent $PSScriptRoot) "internal/bundle/windows-x64.json") -Raw | ConvertFrom-Json

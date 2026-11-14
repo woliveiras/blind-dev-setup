@@ -136,7 +136,15 @@ func (c Component) validate() error {
 		return err
 	}
 	switch c.Kind {
-	case "zip", "self-extracting-7zip", "nvda-portable", "executable":
+	case "git-portable-7zip":
+		if c.ID != "git" {
+			return errors.New("git-portable-7zip is only supported for the git component")
+		}
+	case "executable":
+		if len(c.ExpectedFiles) != 1 || !safeRelativePath(c.ExpectedFiles[0]) || strings.ContainsAny(c.ExpectedFiles[0], "/\\:") {
+			return errors.New("executable installation requires one safe destination filename")
+		}
+	case "zip", "self-extracting-7zip", "nvda-portable":
 	default:
 		return fmt.Errorf("unsupported installation kind %q", c.Kind)
 	}

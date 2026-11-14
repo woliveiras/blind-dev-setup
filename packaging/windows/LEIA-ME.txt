@@ -8,22 +8,33 @@ Um pacote de teste da CI ainda depende da validacao pratica com NVDA.
 
 PREPARAR NA MESMA JANELA
 
-1. Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executavel sem argumentos tambem inicia o assistente.
-2. O assistente mostra nome, letra, tamanho, espaco livre e situacao das unidades. Confira essas informacoes e digite o numero da unidade desejada. Mesmo com apenas uma unidade, voce precisa escolhe-la.
-3. Use R para atualizar a lista depois de conectar ou reconectar uma unidade. Use 0 para sair.
-4. Leia o plano com as ferramentas, versoes e links das licencas. Digite ACEITO para aceitar as licencas e SIM para confirmar o destino quando solicitado. Sem as duas confirmacoes, a preparacao nao comeca.
-5. Acompanhe o download, a preparacao e a verificacao na mesma janela. Nao e preciso fechar a janela para copiar comandos para outro terminal.
-6. Ao concluir, escolha 1 para abrir a pasta do ambiente no Explorador de Arquivos, 2 para preparar outro pendrive ou 0 para sair. Na pasta do ambiente, abra START.cmd quando quiser iniciar NVDA e VS Code. O assistente nao inicia esses aplicativos automaticamente. As mensagens de erro e as opcoes para continuar tambem ficam na mesma janela.
+Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executavel sem argumentos tambem inicia o assistente.
 
-Se a unidade escolhida ja tiver uma instalacao, o assistente oferece verifica-la. Digite SIM para verificar sem preparar novamente ou sobrescrever arquivos. Apos verificar com sucesso, o menu final continua disponivel na mesma janela.
+Na pergunta inicial, pressione Enter ou 1 para o modo acessivel para NVDA, 2 para o modo visual ou 0 para sair. Nao e preciso abrir outro terminal ou conhecer comandos para escolher o modo.
 
-O programa nao formata, nao particiona, nao escolhe um pendrive automaticamente e nao sobrescreve um ambiente existente. Se o pendrive nao atender aos requisitos, leia o motivo e escolha outra unidade ou atualize a lista. Nao formate uma unidade apenas para contornar um erro sem antes preservar seus arquivos.
+O assistente tem cinco etapas:
 
-Preparacao e verificacao concluidas significam que o ambiente foi criado e passou pela verificacao estrutural. Isso nao aprova sua acessibilidade. Siga TESTE-WINDOWS.md e VALIDACAO.md com NVDA. A instalacao das extensoes Python continua opcional, conforme EXTENSOES-PYTHON.md.
+1. Escolher pendrive: confira nome, letra, tamanho e espaco livre. Escolha a unidade explicitamente, mesmo quando so houver uma.
+2. Revisar aplicativos e licencas: leia o resumo e abra detalhes para consultar as ferramentas, versoes e links. Aceite somente se concordar.
+3. Confirmar destino: confira a unidade novamente. Sem aceite das licencas e confirmacao, nada e instalado.
+4. Preparar e verificar: acompanhe o progresso resumido. A saida tecnica fica no log; consulte detalhes depois da operacao para ver seu caminho.
+5. Concluir: escolha abrir a pasta do ambiente, preparar outro pendrive ou sair. Na pasta, abra START.cmd quando quiser iniciar NVDA e VS Code; eles nao abrem automaticamente.
+
+No modo acessivel, responda as opcoes em texto e pressione Enter: R atualiza a lista, 0 sai, D mostra detalhes quando oferecido, ACEITO aceita as licencas e SIM confirma o destino. No modo visual, use as opcoes e teclas indicadas nos formularios. As protecoes sao iguais nos dois modos.
+
+Uma unidade ja preparada pode ser verificada na mesma janela, sem reinstalar nem sobrescrever. Em caso de falha, leia o resumo e consulte detalhes ou o log indicado antes de escolher como continuar.
+
+O programa nao formata, nao particiona, nao escolhe um pendrive automaticamente e nao sobrescreve um ambiente existente.
+
+Conclusao significa preparacao e verificacao estrutural. O modo acessivel ainda precisa de validacao pratica com pessoas cegas usando NVDA. Siga TESTE-WINDOWS.md e VALIDACAO.md. As extensoes Python continuam opcionais, conforme EXTENSOES-PYTHON.md.
 
 LINHA DE COMANDO OPCIONAL
 
-Os comandos continuam disponiveis para automacao e diagnostico. No PowerShell, na pasta do programa:
+Os comandos continuam disponiveis para automacao e diagnostico. No PowerShell, na pasta do programa, voce tambem pode iniciar um modo diretamente:
+  .\blind-dev-setup-windows-x64.exe wizard --accessible
+  .\blind-dev-setup-windows-x64.exe wizard --visual
+
+Com entrada redirecionada, o assistente usa o modo acessivel.
 
 Procurar pendrives:
   .\blind-dev-setup-windows-x64.exe list-targets

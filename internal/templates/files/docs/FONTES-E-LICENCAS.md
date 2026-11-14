@@ -16,3 +16,13 @@ Documentação oficial usada para o desenho:
 - DBeaver Community: https://dbeaver.io/download/
 
 Cada ferramenta mantém sua própria licença. plan mostra o identificador e o manifesto contém o link correspondente. O aceite dado ao gerador não altera nem substitui os termos dos fornecedores.
+
+## Helper 7-Zip
+
+A preparação baixa o executável de console `7zr.exe` oficial, versão 26.06, para extrair o pacote Portable Git sem abrir uma janela do autoextrator. O manifesto registra URL, tamanho e SHA-256; o helper fica em `tools/7zip/7zr.exe`.
+
+- [Release oficial 26.06 e código-fonte correspondente](https://github.com/ip7z/7zip/releases/tag/26.06).
+- [Código-fonte na tag 26.06](https://github.com/ip7z/7zip/tree/26.06).
+- [Informações de licença oficiais](https://www.7-zip.org/license.txt), reproduzidas em [LICENSE-7ZIP.txt](LICENSE-7ZIP.txt).
+
+O executável `7zr.exe` usa GNU LGPL 2.1 ou posterior, conforme as informações do fornecedor para os arquivos que não são `7z.dll`. Ele é distribuído sem alterações pelo fornecedor e baixado pelo gerador; o projeto não modifica seu código. Consulte o texto de licença e o código-fonte correspondente na release indicada.

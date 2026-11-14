@@ -4,12 +4,16 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/charmbracelet/x/ansi"
+	"github.com/woliveiras/blind-dev-setup/internal/progress"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
 )
 
@@ -17,7 +21,11 @@ func wizardCandidate() target.Candidate {
 	return target.Candidate{DiskNumber: 2, Model: "Meu USB", DriveLetter: "E", Label: "PROJETOS", FileSystem: "NTFS", SizeBytes: 32 << 30, FreeBytes: 20 << 30}
 }
 
-func wizardDependencies(input string) Dependencies {
+func wizardDependencies(t *testing.T, input string) Dependencies {
+	directory := t.TempDir()
+	t.Setenv("TMPDIR", directory)
+	t.Setenv("TEMP", directory)
+	t.Setenv("TMP", directory)
 	return Dependencies{
 		Manifest: cliManifest(), Input: strings.NewReader(input),
 		ListTargets: func() ([]target.Candidate, error) { return []target.Candidate{wizardCandidate()}, nil },
@@ -29,7 +37,7 @@ func wizardDependencies(input string) Dependencies {
 func TestWizardPreparesVerifiesAndOpensInOneSession(t *testing.T) {
 	var output bytes.Buffer
 	var events []string
-	deps := wizardDependencies("1\nACEITO\nSIM\n1\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n1\n0\n")
 	deps.Prepare = func(request PrepareRequest) error {
 		if request.Target != "E:\\" {
 			t.Fatalf("target = %q", request.Target)
@@ -57,7 +65,7 @@ func TestWizardPreparesVerifiesAndOpensInOneSession(t *testing.T) {
 	if strings.Join(events, ",") != "prepare,verify,open" {
 		t.Fatalf("events = %v", events)
 	}
-	for _, expected := range []string{"Meu USB", "PROJETOS", "32.0 GiB", "E:\\", "https://example.test/license", "ACEITO", "SIM", "Preparação e verificação concluídas.", "START.cmd"} {
+	for _, expected := range []string{"Meu USB", "PROJETOS", "32.0 GiB", "E:\\", "ACEITO", "SIM", "Preparação e verificação concluídas.", "START.cmd"} {
 		if !strings.Contains(output.String(), expected) {
 			t.Errorf("missing %q in %s", expected, output.String())
 		}
@@ -65,21 +73,162 @@ func TestWizardPreparesVerifiesAndOpensInOneSession(t *testing.T) {
 }
 
 func TestWizardNeverInfersConsentFromEOFOrRefusal(t *testing.T) {
-	for _, input := range []string{"", "0\n", "1\n", "1\nACEITO\n", "1\nACEITO\nSIM", "1\nNAO\n0\n", "1\nACEITO\nV\n0\n", "1\nsim\n0\n"} {
+	for _, input := range []string{"", "0\n", "1\n", "1\nACEITO\n", "1\nACEITO\nSIM", "1\nNAO\n0\n", "1\nACEITO\nV\n0\n", "1\nsim\n0\n", "1\nACEITO\nerrado\n", "1\nerrado\n", "1\nACEITO\n\n"} {
 		t.Run(strings.ReplaceAll(input, "\n", "_"), func(t *testing.T) {
-			deps := wizardDependencies(input)
+			deps := wizardDependencies(t, input)
 			deps.Prepare = func(PrepareRequest) error { t.Fatal("prepare called without full consent"); return nil }
 			deps.Verify = func(string, io.Writer) error { t.Fatal("verify unexpectedly called"); return nil }
 			var output bytes.Buffer
 			if code := Run(nil, &output, &output, deps); code != 0 {
 				t.Fatalf("code=%d; %s", code, output.String())
 			}
+			logs, _ := filepath.Glob(filepath.Join(os.TempDir(), "blind-dev-setup-*.log"))
+			if len(logs) != 0 {
+				t.Fatalf("cancellation created logs: %v", logs)
+			}
 		})
 	}
 }
 
+func TestWizardShowsLicensesOnlyOnRequest(t *testing.T) {
+	deps := wizardDependencies(t, "1\nD\nACEITO\nSIM\n0\n")
+	var output bytes.Buffer
+	if code := Run([]string{"wizard", "--accessible"}, &output, &output, deps); code != 0 {
+		t.Fatalf("code=%d; %s", code, output.String())
+	}
+	if !strings.Contains(output.String(), "https://example.test/license") {
+		t.Fatal("D did not show license source")
+	}
+}
+
+func TestWizardCapturesTechnicalLogsAndShowsRealProgress(t *testing.T) {
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n0\n")
+	deps.Prepare = func(request PrepareRequest) error {
+		fmt.Fprintln(request.Output, "\x1b[31mprivate technical install output\x1b[0m")
+		request.Report(progress.Event{Stage: progress.Download, Component: "Editor", Index: 1, Total: 2})
+		request.Report(progress.Event{Stage: progress.Extract, Component: "Editor", Index: 1, Total: 2})
+		return nil
+	}
+	deps.Verify = func(_ string, output io.Writer) error { fmt.Fprintln(output, "technical verification"); return nil }
+	var output bytes.Buffer
+	if code := Run([]string{"wizard", "--accessible"}, &output, &output, deps); code != 0 {
+		t.Fatalf("code=%d; %s", code, output.String())
+	}
+	text := output.String()
+	if strings.Contains(text, "private technical") || strings.Contains(text, "technical verification") || strings.Contains(text, "\x1b") {
+		t.Fatalf("technical/control output leaked: %q", text)
+	}
+	for _, expected := range []string{"Baixando Editor (1 de 2)", "Extraindo Editor (1 de 2)", "Conferindo arquivos"} {
+		if !strings.Contains(text, expected) {
+			t.Errorf("missing %q", expected)
+		}
+	}
+	logs, _ := filepath.Glob(filepath.Join(os.TempDir(), "blind-dev-setup-*.log"))
+	if len(logs) != 1 {
+		t.Fatalf("logs=%v", logs)
+	}
+	content, err := os.ReadFile(logs[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Contains(content, []byte("private technical")) || !bytes.Contains(content, []byte("technical verification")) {
+		t.Fatalf("log=%s", content)
+	}
+}
+
+func TestWizardDetailsSanitizeLogsAfterFailure(t *testing.T) {
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\nD\n0\n")
+	deps.Prepare = func(request PrepareRequest) error {
+		fmt.Fprintln(request.Output, "\x1b[2Jdiagnostic detail\x00")
+		return errors.New("network interrupted")
+	}
+	var output bytes.Buffer
+	if code := Run([]string{"wizard", "--accessible"}, &output, &output, deps); code != 1 {
+		t.Fatalf("code=%d; %s", code, output.String())
+	}
+	text := output.String()
+	for _, expected := range []string{"Registro completo:", "diagnostic detail", "network interrupted"} {
+		if !strings.Contains(text, expected) {
+			t.Errorf("missing %q; %s", expected, text)
+		}
+	}
+	if strings.ContainsAny(text, "\x1b\x00") {
+		t.Fatalf("unsanitized control codes: %q", text)
+	}
+}
+
+func TestWizardModeFlagsFallbackAndConflict(t *testing.T) {
+	for _, flag := range []string{"--accessible", "--visual"} {
+		deps := wizardDependencies(t, "0\n")
+		var output bytes.Buffer
+		if code := Run([]string{"wizard", flag}, &output, &output, deps); code != 0 {
+			t.Fatalf("code=%d", code)
+		}
+		if strings.Contains(output.String(), "\x1b") {
+			t.Fatalf("non-TTY received escape sequences: %q", output.String())
+		}
+		if flag == "--visual" && !strings.Contains(output.String(), "modo para leitor de tela") {
+			t.Fatal("missing visual fallback explanation")
+		}
+	}
+	deps := wizardDependencies(t, "")
+	if code := Run([]string{"wizard", "--accessible", "--visual"}, io.Discard, io.Discard, deps); code != 2 {
+		t.Fatalf("conflict code=%d", code)
+	}
+}
+
+func TestWizardModeBootstrapDoesNotConsumeVisualKeys(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	raw := strings.NewReader("2\nj\r")
+	w := wizard{ctx: ctx, input: newWizardInput(ctx, raw), rawInput: raw, output: io.Discard}
+	if !w.chooseMode(false, false, true) || w.accessible {
+		t.Fatal("visual mode not selected")
+	}
+	remaining, _ := io.ReadAll(raw)
+	if string(remaining) != "j\r" {
+		t.Fatalf("bootstrap consumed keys: %q", remaining)
+	}
+}
+
+func TestWizardVisualHuhFormActuallyRendersAndAcceptsSelection(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var output bytes.Buffer
+	reader, writer := io.Pipe()
+	defer reader.Close()
+	defer writer.Close()
+	go func() {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(100 * time.Millisecond):
+		}
+		_, _ = io.WriteString(writer, "\x1b[B\r")
+	}()
+	w := wizard{ctx: ctx, rawInput: reader, output: &output, accessible: false}
+	value, ok := w.ask("Escolha visual", "Teste do formulário", []wizardOption{{"1", "Primeira opção"}, {"2", "Segunda opção"}})
+	if !ok || value != "2" {
+		t.Fatalf("ok=%v value=%q output=%q", ok, value, output.String())
+	}
+	if !strings.Contains(ansi.Strip(output.String()), "Escolha visual") {
+		t.Fatalf("visual form did not render: %q", output.String())
+	}
+}
+
+func TestWizardProgressPanelFitsNarrowTerminal(t *testing.T) {
+	for _, width := range []int{12, 24, 40, 76, 120} {
+		view := wizardProgressModel{activity: "Baixando um componente com nome longo (1 de 6)...", width: width}.View()
+		for _, line := range strings.Split(view, "\n") {
+			if ansi.StringWidth(line) > width {
+				t.Fatalf("width=%d, line width=%d: %q", width, ansi.StringWidth(line), line)
+			}
+		}
+	}
+}
+
 func TestWizardInvalidChoicesAndRescanStayInSameSession(t *testing.T) {
-	deps := wizardDependencies("R\n99\n1\nerrado\nACEITO\nSIM\n0\n")
+	deps := wizardDependencies(t, "R\n99\n1\nerrado\nACEITO\nSIM\n0\n")
 	lists, prepared := 0, 0
 	deps.ListTargets = func() ([]target.Candidate, error) {
 		lists++
@@ -101,7 +250,7 @@ func TestWizardInvalidChoicesAndRescanStayInSameSession(t *testing.T) {
 func TestWizardRefusesChangedOrUnavailableTargetsBeforeWriting(t *testing.T) {
 	for _, scenario := range []string{"disappeared", "disk", "model", "size", "label", "filesystem", "existing", "space", "discovery error"} {
 		t.Run(scenario, func(t *testing.T) {
-			deps := wizardDependencies("1\nACEITO\nSIM\n0\n")
+			deps := wizardDependencies(t, "1\nACEITO\nSIM\n0\n")
 			calls := 0
 			deps.ListTargets = func() ([]target.Candidate, error) {
 				calls++
@@ -143,7 +292,7 @@ func TestWizardRefusesChangedOrUnavailableTargetsBeforeWriting(t *testing.T) {
 func TestWizardIneligibleTargetsNeverPrepare(t *testing.T) {
 	for _, scenario := range []string{"system", "exfat", "space", "no letter"} {
 		t.Run(scenario, func(t *testing.T) {
-			deps := wizardDependencies("1\n0\n")
+			deps := wizardDependencies(t, "1\n0\n")
 			deps.ListTargets = func() ([]target.Candidate, error) {
 				c := wizardCandidate()
 				switch scenario {
@@ -169,7 +318,7 @@ func TestWizardIneligibleTargetsNeverPrepare(t *testing.T) {
 }
 
 func TestWizardRetriesFailedPreparationWithoutRestarting(t *testing.T) {
-	deps := wizardDependencies("1\nACEITO\nSIM\n1\nACEITO\nSIM\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n1\nACEITO\nSIM\n0\n")
 	prepares, verifies := 0, 0
 	deps.Prepare = func(PrepareRequest) error {
 		prepares++
@@ -186,7 +335,7 @@ func TestWizardRetriesFailedPreparationWithoutRestarting(t *testing.T) {
 }
 
 func TestWizardExistingInstallationCanVerifyWithoutFreeSpace(t *testing.T) {
-	deps := wizardDependencies("1\nSIM\n0\n")
+	deps := wizardDependencies(t, "1\nSIM\n0\n")
 	deps.ListTargets = func() ([]target.Candidate, error) {
 		c := wizardCandidate()
 		c.DestinationExists = true
@@ -206,7 +355,7 @@ func TestWizardExistingInstallationCanVerifyWithoutFreeSpace(t *testing.T) {
 }
 
 func TestWizardDoesNotAnnounceSuccessAfterVerificationFailure(t *testing.T) {
-	deps := wizardDependencies("1\nACEITO\nSIM\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n0\n")
 	deps.Verify = func(string, io.Writer) error { return errors.New("python.exe missing") }
 	var output bytes.Buffer
 	if code := Run(nil, &output, &output, deps); code != 1 {
@@ -218,7 +367,7 @@ func TestWizardDoesNotAnnounceSuccessAfterVerificationFailure(t *testing.T) {
 }
 
 func TestWizardOpenFailureHasRecoveryMenu(t *testing.T) {
-	deps := wizardDependencies("1\nACEITO\nSIM\n1\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n1\n0\n")
 	deps.OpenEnvironment = func(string) error { return errors.New("Explorer unavailable") }
 	var output bytes.Buffer
 	if code := Run(nil, &output, &output, deps); code != 1 {
@@ -230,7 +379,7 @@ func TestWizardOpenFailureHasRecoveryMenu(t *testing.T) {
 }
 
 func TestWizardExplicitTargetUsesInspectionAndStillRequiresConsent(t *testing.T) {
-	deps := wizardDependencies("1\nACEITO\nSIM\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n0\n")
 	deps.ListTargets = func() ([]target.Candidate, error) { t.Fatal("explicit target must use inspection"); return nil, nil }
 	inspected := 0
 	deps.Inspect = func(path string) (target.Details, error) {
@@ -255,7 +404,7 @@ func TestWizardExplicitTargetUsesInspectionAndStillRequiresConsent(t *testing.T)
 }
 
 func TestWizardExplicitTargetRevalidatesBeforePreparation(t *testing.T) {
-	deps := wizardDependencies("1\nACEITO\nSIM\n0\n")
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\n0\n")
 	count := 0
 	deps.Inspect = func(path string) (target.Details, error) {
 		count++
@@ -278,7 +427,7 @@ func TestWizardCancellationInterruptsBlockedInput(t *testing.T) {
 	defer writer.Close()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	deps := wizardDependencies("")
+	deps := wizardDependencies(t, "")
 	deps.Context = ctx
 	deps.Input = reader
 	listed := make(chan struct{})

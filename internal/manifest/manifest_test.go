@@ -34,6 +34,19 @@ func TestParseRejectsUnsafeOrUnverifiableComponents(t *testing.T) {
 		{name: "absolute destination", edit: func(m *Manifest) { m.Components[0].Destination = "C:\\tool" }, want: "relative"},
 		{name: "parent destination", edit: func(m *Manifest) { m.Components[0].Destination = "../tool" }, want: "relative"},
 		{name: "unknown installer", edit: func(m *Manifest) { m.Components[0].Kind = "powershell" }, want: "kind"},
+		{name: "Git extractor for another component", edit: func(m *Manifest) { m.Components[0].Kind = "git-portable-7zip" }, want: "only supported for the git"},
+		{name: "executable with nested destination", edit: func(m *Manifest) {
+			m.Components[0].Kind = "executable"
+			m.Components[0].ExpectedFiles = []string{"sub/tool.exe"}
+		}, want: "safe destination filename"},
+		{name: "executable with Windows separator", edit: func(m *Manifest) {
+			m.Components[0].Kind = "executable"
+			m.Components[0].ExpectedFiles = []string{"..\\tool.exe"}
+		}, want: "safe destination filename"},
+		{name: "executable with multiple filenames", edit: func(m *Manifest) {
+			m.Components[0].Kind = "executable"
+			m.Components[0].ExpectedFiles = []string{"one.exe", "two.exe"}
+		}, want: "safe destination filename"},
 		{name: "duplicate component", edit: func(m *Manifest) { m.Components = append(m.Components, m.Components[0]) }, want: "duplicate"},
 		{
 			name: "overlapping destinations",

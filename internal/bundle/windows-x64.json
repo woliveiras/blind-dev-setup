@@ -11,6 +11,22 @@
   },
   "components": [
     {
+      "id": "sevenzip",
+      "name": "7-Zip",
+      "version": "26.06",
+      "required": true,
+      "url": "https://github.com/ip7z/7zip/releases/download/26.06/7zr.exe",
+      "sha256": "e80db2dad715a6c5adabe292d31ed54e11f4e9b99ca349827b50573b175891bc",
+      "license": "LGPL-2.1-or-later",
+      "license_url": "https://www.7-zip.org/license.txt",
+      "kind": "executable",
+      "destination": "tools/7zip",
+      "download_bytes": 600064,
+      "expected_files": [
+        "7zr.exe"
+      ]
+    },
+    {
       "id": "git",
       "name": "Git for Windows Portable",
       "version": "2.55.0.4",
@@ -19,13 +35,9 @@
       "sha256": "016e84230a3767f0c6b3788e79ba0c58a17377086801719d46700fca4f7b36b5",
       "license": "GPL-2.0-only",
       "license_url": "https://github.com/git-for-windows/git/blob/main/COPYING",
-      "kind": "self-extracting-7zip",
+      "kind": "git-portable-7zip",
       "destination": "tools/git",
       "download_bytes": 58915456,
-      "arguments": [
-        "-y",
-        "-o{destination}"
-      ],
       "expected_files": [
         "cmd/git.exe",
         "bin/bash.exe"

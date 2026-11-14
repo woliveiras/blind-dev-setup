@@ -29,6 +29,8 @@ func TestReadmeStartsUsersWithPrebuiltDownloads(t *testing.T) {
 		"### Assistente na mesma janela",
 		"sem argumentos",
 		"### Linha de comando opcional",
+		"wizard --accessible",
+		"wizard --visual",
 	} {
 		if !strings.Contains(readme, required) {
 			t.Errorf("README does not contain %q", required)

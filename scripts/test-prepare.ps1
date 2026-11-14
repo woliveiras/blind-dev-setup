@@ -49,16 +49,41 @@ function Invoke-Wizard {
         [string[]]$Answers = @()
     )
 
-    # Send real prompt responses through stdin. Preserve the live job log while
-    # collecting a transcript so exit code zero alone cannot pass this test.
+    # Give this invocation its own temp directory. The wizard keeps technical
+    # output in blind-dev-setup-*.log; this scope avoids reading older logs or
+    # depending on localized UI strings when an installation fails.
+    $invocationTemp = Join-Path $WorkDirectory ("wizard-temp-" + [guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $invocationTemp | Out-Null
+    $previousTemp = $env:TEMP
+    $previousTmp = $env:TMP
     $lines = [System.Collections.Generic.List[string]]::new()
-    $Answers | & $FilePath @ArgumentList 2>&1 | ForEach-Object {
-        $line = [string]$_
-        $lines.Add($line)
-        Write-Host $line
+    $wizardExitCode = $null
+    try {
+        $env:TEMP = $invocationTemp
+        $env:TMP = $invocationTemp
+        # Preserve live progress while collecting the full UI transcript.
+        $Answers | & $FilePath @ArgumentList 2>&1 | ForEach-Object {
+            $line = [string]$_
+            $lines.Add($line)
+            Write-Host $line
+        }
+        $wizardExitCode = $LASTEXITCODE
     }
-    if ($LASTEXITCODE -ne 0) {
-        throw "Wizard failed with exit code $LASTEXITCODE."
+    finally {
+        $env:TEMP = $previousTemp
+        $env:TMP = $previousTmp
+    }
+    if ($wizardExitCode -ne 0) {
+        try {
+            foreach ($log in @(Get-ChildItem -LiteralPath $invocationTemp -Filter "blind-dev-setup-*.log" -File)) {
+                Write-Host "Technical log tail: $($log.FullName)"
+                Get-Content -LiteralPath $log.FullName -Tail 120 | Out-Host
+            }
+        }
+        catch {
+            Write-Warning "Could not read wizard diagnostics: $_"
+        }
+        throw "Wizard failed with exit code $wizardExitCode."
     }
     return ($lines -join [Environment]::NewLine)
 }
@@ -118,22 +143,33 @@ exit
     $sentinelContent = "Wizard must preserve existing files."
     Set-Content -LiteralPath $sentinel -Value $sentinelContent -Encoding ascii
 
-    # The ordinary no-argument executable must accept cancellation without
-    # writing. The VHD is not USB, so an explicit target is used for installation.
+    # Redirected no-argument startup uses accessible mode automatically; it
+    # must accept cancellation without writing. The VHD is not USB, so the
+    # full test explicitly selects its path, retaining every consent prompt.
     $null = Invoke-Wizard -FilePath $executable -Answers @("0")
-    $wizardArguments = @("wizard", "--target", $target, "--cache", $cache)
-    # EOF after target selection cannot act as license acceptance/confirmation.
-    $null = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers @("1")
-    if ((Test-Path -LiteralPath $bundleRoot) -or (Test-Path -LiteralPath $cache) -or
-        @(Get-ChildItem -LiteralPath $target -Force -Filter ".blind-dev-setup-staging-*").Count -ne 0) {
-        throw "Cancelled wizard wrote an installation, staging directory or cache."
-    }
-    if ((Get-Content -LiteralPath $sentinel -Raw).Trim() -ne $sentinelContent) {
-        throw "Cancelled wizard modified an existing file."
+    $wizardArguments = @("wizard", "--accessible", "--target", $target, "--cache", $cache)
+    $cancelScenarios = @(
+        @{ Name = "exit at target selection"; Answers = @("0") },
+        @{ Name = "exit before license acceptance"; Answers = @("1", "0") },
+        @{ Name = "exit before destination confirmation"; Answers = @("1", "ACEITO", "0") },
+        @{ Name = "EOF before license acceptance"; Answers = @("1") },
+        @{ Name = "EOF before destination confirmation"; Answers = @("1", "ACEITO") }
+    )
+    foreach ($scenario in $cancelScenarios) {
+        Write-Host "Testing accessible wizard cancellation: $($scenario.Name)."
+        $null = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers $scenario.Answers
+        if ((Test-Path -LiteralPath $bundleRoot) -or (Test-Path -LiteralPath $cache) -or
+            @(Get-ChildItem -LiteralPath $target -Force -Filter ".blind-dev-setup-staging-*").Count -ne 0) {
+            throw "Cancelled wizard wrote an installation, staging directory or cache: $($scenario.Name)."
+        }
+        if ((Get-Content -LiteralPath $sentinel -Raw).Trim() -ne $sentinelContent) {
+            throw "Cancelled wizard modified an existing file: $($scenario.Name)."
+        }
     }
 
     # Exercise target choice, license acceptance, destination confirmation,
-    # real preparation, automatic verification, and exit in one process/window.
+    # real preparation, automatic verification, and exit through the accessible
+    # huh forms in one process/window. The visual UI remains a manual test.
     $transcript = Invoke-Wizard -FilePath $executable -ArgumentList $wizardArguments -Answers @(
         "1", "ACEITO", "SIM", "0"
     )
@@ -185,6 +221,26 @@ foreach ($tool in @("python", "node", "uv", "pnpm")) {
     }
     Write-Host $version
 }
+# Portable Git must be usable after its silent extraction and post-install step.
+$gitCommand = Get-Command git -ErrorAction Stop
+$expectedGitPath = Join-Path $root "tools\git\cmd\git.exe"
+if (-not [string]::Equals($gitCommand.Source, $expectedGitPath, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Git resolved outside the portable environment: $($gitCommand.Source)"
+}
+$gitVersion = (& git --version | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { throw "Portable git --version failed." }
+$gitComponent = @($manifest.components | Where-Object id -eq "git")[0]
+$expectedGitVersion = $gitComponent.version -replace '^(\d+\.\d+\.\d+)\.(\d+)$', '$1.windows.$2'
+if ($gitVersion -ne "git version $expectedGitVersion") {
+    throw "Portable Git returned unexpected version: $gitVersion"
+}
+Write-Host "$gitVersion resolves to $($gitCommand.Source)"
+$bashExecutable = Join-Path $root "tools\git\bin\bash.exe"
+$bashOutput = (& $bashExecutable --noprofile --norc -c 'printf portable-git-ok' | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or $bashOutput -ne "portable-git-ok") {
+    throw "Portable Bash could not execute the smoke command: $bashOutput"
+}
+Write-Host "Portable Bash execution passed: $bashExecutable"
 if ($RunExamples) {
     $pythonExecutable = (& python -c 'import sys; print(sys.executable)' | Out-String).Trim()
     if ($LASTEXITCODE -ne 0 -or -not $pythonExecutable.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -275,7 +331,7 @@ if ($RunExamples) {
         Move-Item -LiteralPath $nodeBackup -Destination $nodeExecutable
     }
     Invoke-Checked -FilePath $executable -ArgumentList @("verify", "--target", $target)
-    Write-Host "Wizard preparation, verify, PATH commands, drive-letter change and rejection checks passed."
+    Write-Host "Accessible wizard preparation, EOF/cancel, existing verification, PATH commands, drive-letter change and rejection checks passed."
 }
 finally {
     Remove-TestVolume

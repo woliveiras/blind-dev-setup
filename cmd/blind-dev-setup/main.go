@@ -45,7 +45,9 @@ func main() {
 		Inspect:         target.Inspect,
 		OpenEnvironment: openEnvironment,
 		Prepare: func(request cli.PrepareRequest) error {
-			return creator.Run(ctx, request.Target, request.Cache, request.Output)
+			operation := creator
+			operation.Report = request.Report
+			return operation.Run(ctx, request.Target, request.Cache, request.Output)
 		},
 		Verify: func(targetPath string, output io.Writer) error {
 			return verify.Run(targetPath, current, output)

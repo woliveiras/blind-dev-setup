@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/woliveiras/blind-dev-setup/internal/manifest"
+	"github.com/woliveiras/blind-dev-setup/internal/progress"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
 )
 
@@ -36,6 +37,9 @@ type Creator struct {
 	Materialize  Materializer
 	Toolchain    ToolchainInstaller
 	Inspect      func(string) (target.Details, error)
+	// Report receives stage changes synchronously. It must return promptly.
+	// A nil callback preserves the ordinary command-line logging behavior.
+	Report func(progress.Event)
 }
 
 func (c Creator) Run(ctx context.Context, requestedTarget, cache string, output io.Writer) error {
@@ -66,11 +70,13 @@ func (c Creator) Run(ctx context.Context, requestedTarget, cache string, output 
 	fmt.Fprintf(output, "Destino validado: %s; NTFS; %.1f GiB livres.\n", details.Path, float64(details.FreeBytes)/(1<<30))
 	for index, component := range c.Manifest.Components {
 		fmt.Fprintf(output, "Componente %d de %d: %s %s.\n", index+1, len(c.Manifest.Components), component.Name, component.Version)
+		c.report(progress.Event{Stage: progress.Download, Component: component.Name, Index: index + 1, Total: len(c.Manifest.Components)})
 		artifactPath, err := c.Fetch.Fetch(ctx, component, cache)
 		if err != nil {
 			return fmt.Errorf("%s: %w", component.ID, err)
 		}
 		fmt.Fprintln(output, "Download conferido por tamanho e SHA-256.")
+		c.report(progress.Event{Stage: progress.Extract, Component: component.Name, Index: index + 1, Total: len(c.Manifest.Components)})
 		if err := c.Install.Install(ctx, component, artifactPath, staging, output); err != nil {
 			return fmt.Errorf("instalar %s: %w", component.ID, err)
 		}
@@ -81,10 +87,12 @@ func (c Creator) Run(ctx context.Context, requestedTarget, cache string, output 
 	}
 
 	fmt.Fprintln(output, "Criando configurações, launchers e documentação no pendrive.")
+	c.report(progress.Event{Stage: progress.Configure})
 	if err := c.Materialize.Write(staging, c.ManifestJSON); err != nil {
 		return fmt.Errorf("criar arquivos do ambiente: %w", err)
 	}
 	fmt.Fprintln(output, "Instalando Python, Node.js, uv e pnpm pelo mise.")
+	c.report(progress.Event{Stage: progress.Toolchain})
 	if err := c.Toolchain.Install(ctx, staging, c.Manifest, output); err != nil {
 		return fmt.Errorf("instalar toolchain: %w", err)
 	}
@@ -99,11 +107,18 @@ func (c Creator) Run(ctx context.Context, requestedTarget, cache string, output 
 	}
 
 	finalPath := filepath.Join(details.Path, target.DirectoryName)
+	c.report(progress.Event{Stage: progress.Publish})
 	if err := publish(ctx, staging, finalPath, output); err != nil {
 		return fmt.Errorf("publicar ambiente concluído: %w", err)
 	}
 	fmt.Fprintf(output, "Preparação concluída: %s\n", finalPath)
 	return nil
+}
+
+func (c Creator) report(event progress.Event) {
+	if c.Report != nil {
+		c.Report(event)
+	}
 }
 
 func (c Creator) validateDependencies() error {
