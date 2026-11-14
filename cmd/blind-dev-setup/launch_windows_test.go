@@ -41,10 +41,10 @@ func TestLaunchEnvironmentRunsFixedScriptInSelectedDirectory(t *testing.T) {
 	}
 }
 
-func TestLaunchEnvironmentReturnsInitializerAndStartErrors(t *testing.T) {
+func TestLaunchEnvironmentReturnsInitializerErrors(t *testing.T) {
 	for _, body := range []string{
 		"@echo off\necho initializer-failed 1>&2\nexit /b 23\n",
-		"@echo off\nstart /not-a-valid-start-switch\nif errorlevel 1 exit /b 17\nexit /b 0\n",
+		"@echo off\ncall .\\missing-initializer.cmd\nif errorlevel 1 exit /b 17\nexit /b 0\n",
 	} {
 		root := launchFixture(t, body)
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
