@@ -14,8 +14,8 @@ O estado de uma release deve ser conferido pelo pacote, seu BUILD-INFO.txt e pel
 
 ## Critérios para aprovar a retomada
 
-- [ ] CI aprovada para a revisão exata entregue, com prepare, verify, ferramentas no local publicado e limpeza.
-- [ ] Pacote de teste com checksum, commit e estado das fontes identificados.
+- [x] CI de integração aprovada: [77cc506](https://github.com/woliveiras/blind-dev-setup/actions/runs/43607297298), com prepare, verify, ferramentas pelo PATH, exemplos, mudança da letra e limpeza. Para cada pacote posterior, exigir aprovação da revisão exata entregue.
+- [x] Pacote de teste com checksum, commit e estado das fontes identificados, conferidos antes do upload pela CI.
 - [ ] Teste em notebook Windows 11 x64, como usuário padrão, usando pendrive real: descoberta, preparação, launchers independentes, exemplos e recusas sem alteração de dados.
 - [ ] Reconexão e mudança da letra, incluindo recriação de ambientes derivados quando necessária.
 - [ ] Versões das extensões Python registradas e diagnóstico/depuração aprovados na combinação testada.

@@ -1,6 +1,6 @@
 # Protocolo de validação com NVDA
 
-Antes dos dez passos, execute TESTE-WINDOWS.md e prepare o exemplo conforme PYTHON-COM-UV.md e EXTENSOES-PYTHON.md. Abra python-example.code-workspace no VS Code portátil. Sem as extensões, símbolos, diagnósticos e depuração ficam não executados.
+Antes dos dez passos, conclua as etapas A e B de TESTE-WINDOWS.md e prepare o exemplo conforme PYTHON-COM-UV.md e EXTENSOES-PYTHON.md. Abra python-example.code-workspace no VS Code portátil. Sem as extensões, símbolos, diagnósticos e depuração ficam não executados.
 
 Execute os dez testes por teclado, sem depender do mouse. Registre versão do Windows, versão do NVDA, sintetizador, características da máquina sem identificar a pessoa, extensões e resultado de cada passo em uma cópia de RESULTADOS-VALIDACAO.md.
 
@@ -12,8 +12,8 @@ Execute os dez testes por teclado, sem depender do mouse. Registre versão do Wi
 6. Executar: rode o programa e confirme que a saída do terminal é legível.
 7. Ler traceback: provoque uma exceção, localize a linha, volte ao código e corrija.
 8. Depurar: use debug_example.py e a configuração Python: exemplo sem erro; coloque breakpoint em total += value, inicie a sessão, avance, leia variáveis e volte ao código sem perder o foco.
-9. Rever diff: altere o arquivo e navegue por arquivo, hunk e linha modificada.
-10. Fazer commit: em uma cópia descartável do exemplo, inicialize um repositório Git local, configure nome e e-mail de teste somente nesse repositório, faça stage, escreva a mensagem e confirme o commit por teclado sem foco perdido. Não publique esse repositório nem copie sua identidade pessoal.
+9. Rever diff: siga primeiro a seção Preparar o teste Git local abaixo; depois altere o arquivo e navegue por arquivo, hunk e linha modificada.
+10. Fazer commit: nessa cópia descartável já inicializada, faça stage, escreva a mensagem e confirme o commit por teclado sem foco perdido. Use apenas a identidade local de teste da seção abaixo. Não publique esse repositório nem copie sua identidade pessoal.
 
 ## Preparar o teste Git local
 
