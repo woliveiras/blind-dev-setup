@@ -106,29 +106,122 @@ exit
         throw "prepare left staging directories behind."
     }
 
-    # Exercise the published location after the staging directory was renamed.
-    # Match DEV-SHELL's trust/reshim setup without opening an interactive shell.
-    $smokeScript = Join-Path $WorkDirectory "check-toolchain.cmd"
-    $commands = @(
-        "@echo off",
-        "setlocal",
-        "call `"$bundleRoot\config\environment.cmd`"",
-        "if errorlevel 1 exit /b 1",
-        'cd /d "%BLIND_DEV_ROOT%\workspace"',
-        '"%BLIND_DEV_ROOT%\tools\mise\mise.exe" trust --yes "%MISE_CONFIG_FILE%"',
-        "if errorlevel 1 exit /b 1",
-        '"%BLIND_DEV_ROOT%\tools\mise\mise.exe" reshim',
-        "if errorlevel 1 exit /b 1"
-    )
-    foreach ($tool in @("python", "node", "uv", "pnpm")) {
-        $version = $manifest.toolchain.$tool
-        $commands += "`"%BLIND_DEV_ROOT%\tools\mise\mise.exe`" exec $tool@$version -- $tool --version"
-        $commands += "if errorlevel 1 exit /b 1"
+    # Test ordinary PATH resolution, without mise exec or the runner's tools.
+    $smokePowerShell = Join-Path $WorkDirectory "check-toolchain.ps1"
+    @'
+param([switch]$RunExamples)
+
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $false
+$root = [System.IO.Path]::GetFullPath($env:BLIND_DEV_ROOT).TrimEnd('\') + '\'
+$manifest = Get-Content -LiteralPath (Join-Path $root "config\manifest.json") -Raw | ConvertFrom-Json
+foreach ($tool in @("python", "node", "uv", "pnpm")) {
+    $command = Get-Command $tool -ErrorAction Stop
+    if (-not $command.Source.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "$tool resolved outside the portable environment: $($command.Source)"
     }
-    $commands += "exit /b 0"
-    $commands | Set-Content -LiteralPath $smokeScript -Encoding ascii
+    Write-Host "$tool resolves to $($command.Source)"
+    $version = (& $tool --version | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0) {
+        throw "$tool --version failed with exit code $LASTEXITCODE."
+    }
+    $expected = [regex]::Escape($manifest.toolchain.$tool)
+    if ($version -notmatch "(?<![0-9.])$expected(?![0-9.])") {
+        throw "$tool returned unexpected version: $version"
+    }
+    Write-Host $version
+}
+if ($RunExamples) {
+    $pythonExecutable = (& python -c 'import sys; print(sys.executable)' | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $pythonExecutable.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Python interpreter resolved outside the portable environment: $pythonExecutable"
+    }
+    Push-Location -LiteralPath (Join-Path $root "workspace\python-example")
+    try {
+        & uv sync --python $pythonExecutable --no-python-downloads
+        if ($LASTEXITCODE -ne 0) { throw "uv sync failed." }
+        & uv run --no-python-downloads python debug_example.py
+        if ($LASTEXITCODE -ne 0) { throw "Python debug example failed." }
+        $pythonBase = (& uv run --no-python-downloads python -c 'import sys; print(sys.base_prefix)' | Out-String).Trim()
+        if ($LASTEXITCODE -ne 0 -or -not $pythonBase.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "uv used a Python installation outside the portable environment: $pythonBase"
+        }
+    }
+    finally { Pop-Location }
+    Push-Location -LiteralPath (Join-Path $root "workspace\node-workspace")
+    try {
+        & pnpm install
+        if ($LASTEXITCODE -ne 0) { throw "pnpm install failed." }
+        & pnpm start
+        if ($LASTEXITCODE -ne 0) { throw "Node workspace example failed." }
+    }
+    finally { Pop-Location }
+    Write-Host "Python and Node workspace examples passed."
+}
+'@ | Set-Content -LiteralPath $smokePowerShell -Encoding ascii
+
+    foreach ($phase in @("published", "relocated")) {
+        if ($phase -eq "relocated") {
+            # Change only the partition belonging to our own mounted image.
+            $usedLetters = @(Get-Volume | Where-Object DriveLetter | ForEach-Object { [string]$_.DriveLetter })
+            $newLetter = 90..70 | ForEach-Object { [char]$_ } |
+                Where-Object { [string]$_ -notin $usedLetters } | Select-Object -First 1
+            if (-not $newLetter) {
+                throw "No free drive letter for the portability test."
+            }
+            $partition | Set-Partition -NewDriveLetter $newLetter
+            $target = "${newLetter}:\"
+            $bundleRoot = Join-Path $target "blind-dev-setup"
+            Invoke-Checked -FilePath $executable -ArgumentList @("verify", "--target", $target)
+        }
+        Write-Host "Testing $phase toolchain through PATH at $bundleRoot."
+        $smokeScript = Join-Path $WorkDirectory "check-toolchain.cmd"
+        $exampleArgument = if ($phase -eq "published") { " -RunExamples" } else { "" }
+        @(
+            "@echo off",
+            "setlocal",
+            'set "PATH=%SystemRoot%\System32;%SystemRoot%;%SystemRoot%\System32\WindowsPowerShell\v1.0"',
+            "call `"$bundleRoot\config\initialize-toolchain.cmd`"",
+            "if errorlevel 1 exit /b 1",
+            'cd /d "%BLIND_DEV_ROOT%\workspace"',
+            "if errorlevel 1 exit /b 1",
+            "`"$PSHOME\pwsh.exe`" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$smokePowerShell`"$exampleArgument",
+            "exit /b %errorlevel%"
+        ) | Set-Content -LiteralPath $smokeScript -Encoding ascii
+        Invoke-Checked -FilePath "cmd.exe" -ArgumentList @("/d", "/c", "`"$smokeScript`"")
+    }
+    # A valid but modified config must be rejected before automatic trust.
+    $miseConfig = Join-Path $bundleRoot "config\mise.toml"
+    $originalConfig = [System.IO.File]::ReadAllBytes($miseConfig)
+    try {
+        Add-Content -LiteralPath $miseConfig -Value "`n# CI: modified managed configuration" -Encoding utf8
+        & cmd.exe /d /c "`"$smokeScript`"" | Out-Host
+        if ($LASTEXITCODE -eq 0) {
+            throw "Toolchain initialization accepted a modified mise.toml."
+        }
+        Write-Host "Toolchain initialization correctly rejected a modified mise.toml."
+    }
+    finally {
+        [System.IO.File]::WriteAllBytes($miseConfig, $originalConfig)
+    }
     Invoke-Checked -FilePath "cmd.exe" -ArgumentList @("/d", "/c", "`"$smokeScript`"")
-    Write-Host "prepare, verify and the published toolchain passed."
+
+    # Keep the install directory intact: verify must notice the missing binary.
+    $nodeExecutable = Join-Path $bundleRoot "data\mise\installs\node\$($manifest.toolchain.node)\node.exe"
+    $nodeBackup = "$nodeExecutable.e2e-backup"
+    Move-Item -LiteralPath $nodeExecutable -Destination $nodeBackup
+    try {
+        & $executable verify --target $target | Out-Host
+        if ($LASTEXITCODE -eq 0) {
+            throw "verify accepted a toolchain installation without node.exe."
+        }
+        Write-Host "verify correctly rejected a missing toolchain executable."
+    }
+    finally {
+        Move-Item -LiteralPath $nodeBackup -Destination $nodeExecutable
+    }
+    Invoke-Checked -FilePath $executable -ArgumentList @("verify", "--target", $target)
+    Write-Host "prepare, verify, PATH commands, drive-letter change and rejection checks passed."
 }
 finally {
     Remove-TestVolume

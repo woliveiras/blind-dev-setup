@@ -67,3 +67,18 @@ jobs:
         timeout-minutes: 3
         shell: pwsh
         run: ./scripts/test-prepare.ps1 -WorkDirectory "$env:RUNNER_TEMP\blind-dev-setup-e2e" -Cleanup
+
+      - name: Verify package checksums and source commit
+        shell: pwsh
+        run: ./scripts/test-package.ps1 -PackageDirectory ./dist -ExpectedCommit $env:GITHUB_SHA
+
+      - name: Upload tested Windows package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: blind-dev-setup-windows-x64-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            dist/blind-dev-setup-windows-x64.exe
+            dist/blind-dev-setup-windows-x64.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14

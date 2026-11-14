@@ -2,6 +2,10 @@ BLIND-DEV-SETUP PARA WINDOWS 11 X64
 
 Este pacote ja contem o programa pronto. Nao e preciso instalar Go, compilar o projeto ou executar como administrador.
 
+Para avaliar esta revisao, leia TESTE-WINDOWS.md antes de preparar o pendrive.
+BUILD-INFO.txt identifica a versao e o commit; registre os resultados em RESULTADOS-VALIDACAO.md.
+Um pacote de teste da CI ainda depende da validacao pratica com NVDA.
+
 PRIMEIRO USO
 
 1. Conecte o pendrive.

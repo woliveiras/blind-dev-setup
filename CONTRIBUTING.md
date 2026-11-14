@@ -15,7 +15,11 @@ Use commits pequenos com Conventional Commits. Não inclua binários de terceiro
 
 ## Teste completo de preparação na CI
 
-O job Windows da CI executa `prepare` e `verify` em um disco virtual temporário de 32 GiB, formatado em NTFS. Ele baixa os componentes reais do manifesto, confere seus hashes, instala o toolchain pelo mise e verifica `READY.txt` e a remoção da área de staging. Depois da publicação, executa Python, Node.js, uv e pnpm a partir do ambiente gerado, com a mesma inicialização de confiança e shims do `DEV-SHELL.cmd`.
+O job Windows da CI executa `prepare` e `verify` em um disco virtual temporário de 32 GiB, formatado em NTFS. Ele baixa os componentes reais do manifesto, confere seus hashes, instala o toolchain pelo mise e verifica `READY.txt` e a remoção da área de staging. Depois da publicação, inicializa o ambiente pelo helper compartilhado `config/initialize-toolchain.cmd` e executa Python, Node.js, uv e pnpm diretamente pelo `PATH`, conferindo origem e versões. O `PATH` inicial contém apenas diretórios do Windows, para impedir que ferramentas instaladas no runner escondam dependências ausentes. O teste muda a letra do volume e repete a verificação e a execução dos comandos.
+
+O teste também altera temporariamente `mise.toml` para comprovar que o helper recusa uma configuração modificada antes de confiar nela, e retira `node.exe` de sua pasta para comprovar que `verify` detecta um toolchain incompleto. Ambos os arquivos são restaurados em `finally`, e os comandos são verificados novamente depois da restauração.
+
+Na primeira letra, o smoke executa `uv sync` com o interpretador portátil explícito e downloads de Python desativados, roda `debug_example.py` e confere que o ambiente virtual usa o Python do pendrive. Também executa `pnpm install` e `pnpm start` no workspace Node. Após a mudança de letra, repete os comandos de versão; a recriação de `.venv` e a depuração gráfica continuam no roteiro manual.
 
 O teste roda em pushes para `main`, pull requests e acionamentos manuais de CI pelo GitHub Actions. Não usa cache persistente; indisponibilidade das fontes oficiais ou divergência de hashes faz o job falhar. A etapa tem limite de 35 minutos, dentro de um job de 45 minutos. O VHDX cresce conforme os dados são escritos e é desmontado e removido em `finally`, com uma etapa `always()` para repetir a limpeza após interrupções. Uma parada forçada do runner pode impedir a limpeza; o runner hospedado é descartável.
 
@@ -28,6 +32,8 @@ Para reproduzir em Windows, compile com `scripts/build.ps1` e execute em PowerSh
 O script cria e formata apenas o disco associado ao seu próprio arquivo VHDX; não recebe uma unidade física de destino. Em caso de interrupção, repita com `-Cleanup` para remover os recursos temporários. O gerador continua sem formatar unidades.
 
 Esse teste usa o Windows do runner e um disco virtual. Não valida detecção USB, interfaces gráficas, acessibilidade com NVDA ou a experiência em Windows 11 como usuário padrão; esses pontos continuam no protocolo de validação manual.
+
+Depois que o teste de preparação e a limpeza passam, o job confere os checksums, compara o executável dentro do ZIP com o executável testado e exige que `BUILD-INFO.txt` registre o commit da execução e `Source state: clean`. Então disponibiliza o executável, o ZIP e `SHA256SUMS.txt` como artefato `blind-dev-setup-windows-x64-<commit>-<tentativa>`, com retenção de 14 dias. Na execução aprovada de CI, baixe esse artefato em Artifacts, extraia o arquivo baixado e confira o SHA-256 do ZIP com `Get-FileHash -Algorithm SHA256 .\blind-dev-setup-windows-x64.zip`, comparando com a linha correspondente em `SHA256SUMS.txt`. O ZIP interno é o pacote para testar no notebook. O artefato identifica a revisão testada e não publica uma release; não use pacotes de execuções com falha.
 
 ## Releases
 
