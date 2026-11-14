@@ -1,6 +1,6 @@
 @echo off
 setlocal
-call "%~dp0config\environment.cmd"
+call "%~dp0config\initialize-toolchain.cmd"
 if errorlevel 1 goto error
 echo Iniciando Visual Studio Code Portable.
 start "" "%BLIND_DEV_ROOT%\tools\vscode\Code.exe" "%BLIND_DEV_ROOT%\workspace"

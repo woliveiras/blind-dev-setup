@@ -28,10 +28,10 @@ func Validate(details Details, minimumFreeBytes int64) error {
 		return errors.New("o destino está no disco do sistema; escolha outro volume")
 	}
 	if !strings.EqualFold(details.FileSystem, "NTFS") {
-		return fmt.Errorf("o destino usa %s; a v0.1.0 exige NTFS", details.FileSystem)
+		return fmt.Errorf("o destino usa %s; esta versão exige NTFS", details.FileSystem)
 	}
 	if details.DestinationExists {
-		return fmt.Errorf("%s já existe no destino; a v0.1.0 não sobrescreve instalações", DirectoryName)
+		return fmt.Errorf("%s já existe no destino; o gerador não sobrescreve instalações", DirectoryName)
 	}
 	if minimumFreeBytes <= 0 {
 		return errors.New("o requisito de espaço é inválido")

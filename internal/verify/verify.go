@@ -1,14 +1,17 @@
 package verify
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 
 	"github.com/woliveiras/blind-dev-setup/internal/manifest"
 	"github.com/woliveiras/blind-dev-setup/internal/target"
+	"github.com/woliveiras/blind-dev-setup/internal/templates"
 )
 
 var requiredPortableFiles = []string{
@@ -58,6 +61,28 @@ func Run(requestedTarget string, expected manifest.Manifest, output io.Writer) e
 		return fmt.Errorf("o manifesto instalado difere do manifesto incorporado neste gerador")
 	}
 	fmt.Fprintf(output, "Manifesto: versão %s; plataforma %s.\n", current.Release, current.Platform)
+	managed, err := templates.ManagedFiles(current)
+	if err != nil {
+		return fmt.Errorf("obter configurações gerenciadas: %w", err)
+	}
+	paths := make([]string, 0, len(managed))
+	for relative := range managed {
+		paths = append(paths, relative)
+	}
+	sort.Strings(paths)
+	for _, relative := range paths {
+		if err := requireRegularFile(root, relative); err != nil {
+			return err
+		}
+		actual, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(relative)))
+		if err != nil {
+			return fmt.Errorf("ler configuração gerenciada %s: %w", relative, err)
+		}
+		if !bytes.Equal(actual, managed[relative]) {
+			return fmt.Errorf("configuração gerenciada difere do gerador: %s; restaure o arquivo original desta versão", relative)
+		}
+	}
+	fmt.Fprintln(output, "Configurações gerenciadas: conteúdo confere com este gerador.")
 
 	for _, component := range current.Components {
 		for _, expected := range component.ExpectedFiles {
@@ -71,16 +96,16 @@ func Run(requestedTarget string, expected manifest.Manifest, output io.Writer) e
 
 	for _, tool := range []string{"python", "node", "uv", "pnpm"} {
 		relative := filepath.Join("data", "mise", "installs", tool, current.Toolchain[tool])
-		info, err := os.Stat(filepath.Join(root, relative))
-		if err != nil {
-			return fmt.Errorf("toolchain ausente: %s %s", tool, current.Toolchain[tool])
+		// The pinned Windows core and aqua distributions expose their executable
+		// at the install root. A version directory alone is not an installation.
+		executable := filepath.Join(relative, tool+".exe")
+		if err := requireRegularFile(root, executable); err != nil {
+			return fmt.Errorf("toolchain %s %s: %w", tool, current.Toolchain[tool], err)
 		}
-		if !info.IsDir() {
-			return fmt.Errorf("toolchain inválida: %s não é diretório", relative)
-		}
-		fmt.Fprintf(output, "Toolchain conferida: %s %s.\n", tool, current.Toolchain[tool])
+		fmt.Fprintf(output, "Executável presente e não vazio: %s %s.\n", tool, current.Toolchain[tool])
 	}
 
+	fmt.Fprintln(output, "Verificação estrutural: os programas não foram executados; os binários instalados não tiveram seus hashes recalculados.")
 	fmt.Fprintln(output, "Verificação concluída sem modificar o pendrive.")
 	return nil
 }
@@ -93,6 +118,9 @@ func requireRegularFile(root, relative string) error {
 	}
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("caminho obrigatório não é arquivo: %s", relative)
+	}
+	if info.Size() == 0 {
+		return fmt.Errorf("arquivo obrigatório vazio: %s", relative)
 	}
 	return nil
 }

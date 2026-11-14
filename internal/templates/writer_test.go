@@ -28,6 +28,8 @@ func TestWriterCreatesPortableLaunchersAndPinnedToolchain(t *testing.T) {
 		"START-NOTEPADPP.cmd",
 		"START-DBEAVER.cmd",
 		"config/environment.cmd",
+		"config/initialize-toolchain.cmd",
+		"config/initialize-toolchain.ps1",
 		"config/manifest.json",
 		"config/mise.toml",
 		"config/mise.lock",
@@ -63,6 +65,22 @@ func TestWriterCreatesPortableLaunchersAndPinnedToolchain(t *testing.T) {
 	for _, want := range []string{"platforms.windows-x64", "checksum = \"sha256:"} {
 		if !strings.Contains(string(miseLock), want) {
 			t.Errorf("mise.lock does not contain %q", want)
+		}
+	}
+}
+
+func TestDevelopmentLaunchersShareToolchainInitialization(t *testing.T) {
+	for _, launcher := range []string{"START.cmd", "START-VSCODE.cmd", "DEV-SHELL.cmd"} {
+		content, err := files.ReadFile("files/" + launcher)
+		if err != nil {
+			t.Fatal(err)
+		}
+		text := strings.ReplaceAll(string(content), "\r\n", "\n")
+		if !strings.Contains(text, "call \"%~dp0config\\initialize-toolchain.cmd\"\nif errorlevel 1 goto error") {
+			t.Errorf("%s must initialize the toolchain and stop on failure", launcher)
+		}
+		if strings.Contains(string(content), "trust --yes") {
+			t.Errorf("%s must not trust configuration outside the validated initializer", launcher)
 		}
 	}
 }
