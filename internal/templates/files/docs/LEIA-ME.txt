@@ -1,4 +1,6 @@
-BLIND-DEV-SETUP 0.1.0
+BLIND-DEV-SETUP
+
+A versão deste ambiente está em READY.txt e config/manifest.json.
 
 Este ambiente foi preparado para Windows 11 x64.
 
@@ -8,7 +10,8 @@ INICIO RAPIDO
 2. Abra DEV-SHELL.cmd para usar Python, Node.js, Git, uv e pnpm.
 3. Salve seus projetos dentro da pasta workspace.
 4. Leia NVDA.md antes de personalizar fala, símbolos ou add-ons.
-5. Execute o protocolo de VALIDACAO.md antes de depender do ambiente para trabalho.
+5. Leia PYTHON-COM-UV.md e EXTENSOES-PYTHON.md para preparar a edição e depuração Python. As extensões são opcionais e exigem sua escolha.
+6. Execute TESTE-WINDOWS.md e VALIDACAO.md antes de depender do ambiente para trabalho. Registre os resultados em uma cópia de RESULTADOS-VALIDACAO.md.
 
 OUTROS INICIALIZADORES
 
@@ -26,3 +29,7 @@ DBeaver é experimental neste projeto até que seus fluxos sejam validados por p
 O ambiente não contém senhas, tokens, chaves SSH ou identidade Git. Configure apenas o que você decidir levar no pendrive e proteja fisicamente a unidade.
 
 Se a letra do pendrive mudar, os projetos continuam sendo a fonte de verdade. Ambientes .venv e node_modules podem precisar ser recriados a partir de pyproject.toml, uv.lock, package.json e pnpm-lock.yaml.
+
+DIAGNOSTICO
+
+verify confere estrutura e configurações; ele não executa os programas nem comprova acessibilidade ou a integridade completa dos aplicativos de terceiros. Os launchers de desenvolvimento conferem as configurações gerenciadas do mise antes de autorizá-las. Se houver divergência, registre o erro e preserve seus projetos; não contorne a verificação.

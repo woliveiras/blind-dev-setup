@@ -13,7 +13,7 @@ A versão atual prepara um pendrive NTFS para Windows 11 x64 com:
 - configurações, caches, workspaces, exemplos e dados mantidos no pendrive;
 - guias de NVDA, uv, pnpm, limitações e validação prática.
 
-O código e o executável Windows foram validados automaticamente. O protocolo completo ainda precisa ser executado em Windows limpo por pessoas cegas; automação não prova acessibilidade.
+O projeto tem testes automatizados e uma CI que prepara um ambiente real em volume NTFS temporário no Windows. Confira o resultado da revisão que está usando: um build ou a presença de arquivos não comprovam o uso completo. O protocolo por teclado e NVDA ainda exige validação prática com pessoas cegas; automação não prova acessibilidade.
 
 ## Segurança do destino
 
@@ -98,9 +98,19 @@ Verifique uma preparação sem modificá-la:
 
     .\blind-dev-setup-windows-x64.exe verify --target E:\
 
-Depois, abra E:\blind-dev-setup\START.cmd para iniciar NVDA e VS Code, ou DEV-SHELL.cmd para abrir o shell portátil.
+Depois, abra E:\blind-dev-setup\START.cmd para iniciar NVDA e VS Code, ou DEV-SHELL.cmd para abrir o shell portátil. Os launchers de desenvolvimento preparam o mise no caminho atual e conferem suas configurações gerenciadas antes de autorizá-las. Se uma configuração tiver sido alterada, registre o erro em vez de contornar a conferência.
+
+`verify` confere estrutura, executáveis esperados e configurações gerenciadas sem executar programas. Ele não prova a integridade completa de todos os arquivos extraídos nem substitui a execução dos exemplos e o teste com NVDA.
 
 Se `list-targets` não encontrar nada, desconecte o pendrive, conecte-o novamente, aguarde alguns segundos e repita o comando. Se o Windows não atribuir uma letra ou o sistema de arquivos não for NTFS, a ferramenta explicará o problema sem tentar formatar a unidade.
+
+## Validar uma revisão no Windows
+
+O pacote de teste inclui `TESTE-WINDOWS.md`, `RESULTADOS-VALIDACAO.md` e `BUILD-INFO.txt`. Confira o commit completo, o estado das fontes (`clean` ou `modified`) e o SHA-256 antes do teste. Para uma revisão auditável, use o artefato da CI aprovada para aquele commit. Um pacote de teste pode incluir correções ainda ausentes na release pública mais recente.
+
+Siga o [roteiro do notebook](internal/templates/files/docs/TESTE-WINDOWS.md) como usuário padrão e registre os resultados na [ficha de validação](internal/templates/files/docs/RESULTADOS-VALIDACAO.md). Ele cobre USB real, origem das ferramentas, launchers, exemplos, recusas, reconexão e mudança da letra. O script de volume virtual da CI não é necessário no notebook.
+
+A edição assistida e a depuração Python exigem a escolha explícita das [extensões oficiais](internal/templates/files/docs/EXTENSOES-PYTHON.md). O [guia Python](internal/templates/files/docs/PYTHON-COM-UV.md) inclui um exemplo com breakpoint, diagnóstico e traceback intencional. As versões das extensões devem ser registradas; ainda não há uma combinação empiricamente aprovada pelo projeto.
 
 ## Compilar o projeto
 
@@ -148,7 +158,7 @@ mise instala e fixa Python, Node.js, uv e pnpm. Dentro de um projeto Python, use
 
 NVDA Portable não cobre login, UAC, telas seguras ou aplicativos elevados. Para esses fluxos, use uma instalação permanente oficial do NVDA. O gerador não copia perfil pessoal, add-ons, credenciais, tokens ou chaves SSH.
 
-VS Code não recebe extensões automaticamente na primeira versão; elas exigem uma decisão separada de proveniência e validação. DBeaver precisa de validação empírica com NVDA. Atualização transacional e Linux estão no roadmap.
+VS Code não recebe extensões automaticamente; o guia Python documenta a instalação opcional e o registro das versões. DBeaver precisa de validação empírica com NVDA. Atualização transacional, Windows arm64 e Linux estão no roadmap.
 
 Leia [a decisão arquitetural](docs/adr/0001-windows-portable-builder.md), [os limites das evidências](docs/research/evidence-boundaries.md), o [roadmap](ROADMAP.md), as [diretrizes de contribuição](CONTRIBUTING.md) e a [política de segurança](SECURITY.md).
 

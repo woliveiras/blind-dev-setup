@@ -1,0 +1,47 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.useEnvironmentsExtension": false
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "ms-python.vscode-pylance"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: exemplo sem erro",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder}/debug_example.py",
+        "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "justMyCode": true
+      },
+      {
+        "name": "Python: traceback intencional",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder}/debug_example.py",
+        "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "args": [
+          "--fail"
+        ],
+        "justMyCode": true
+      }
+    ]
+  }
+}

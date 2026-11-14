@@ -22,4 +22,13 @@
 - Navegação, conexão, consulta e leitura de resultados do DBeaver são utilizáveis por teclado e NVDA.
 - A troca de letra da unidade não impede que uv e pnpm recriem ambientes a partir dos lockfiles.
 
-Configuração e testes automatizados verificam arquivos e comandos, não a experiência real de uma pessoa cega. A aceitação da v0.1.0 requer teste em Windows limpo como usuário padrão e execução do protocolo documentado por pessoas cegas.
+Configuração e testes automatizados verificam arquivos e comandos, não a experiência real de uma pessoa cega. A aceitação prática requer teste em Windows limpo como usuário padrão e execução do protocolo documentado por pessoas cegas. Um notebook já usado também fornece evidência útil, mas é necessário registrar ferramentas existentes e conferir que os comandos vêm do pendrive.
+
+## Retomada em 14 de novembro de 2026
+
+- A [CI do commit 25ae3c1](https://github.com/woliveiras/blind-dev-setup/actions/runs/43606211658) executou preparação real, verificação e os quatro toolchains em Windows Server 2025, com um volume NTFS virtual. Isso não comprova descoberta de USB físico, interfaces gráficas, execução como usuário padrão ou acessibilidade no Windows 11.
+- Essa execução revelou um bloqueio transitório do Windows ao publicar a pasta. O gerador passou a repetir somente falhas de bloqueio conhecidas, durante no máximo 30 segundos, sem substituir uma instalação existente.
+- A execução de [Release Please](https://github.com/woliveiras/blind-dev-setup/actions/runs/43606211597) encontrou corretamente a tag v0.3.1 e considerou somente os dois commits posteriores. A [PR 5](https://github.com/woliveiras/blind-dev-setup/pull/5) não repetiu as mudanças antigas da PR 4, encerrada sem merge. Não foi possível estabelecer a causa histórica da falha da PR 4; os dados atuais não justificam forçar outra versão ou reescrever releases.
+- Cada pacote de teste deve ser identificado pelo commit e pelos checksums dos seus arquivos. Uma execução verde anterior não valida alterações posteriores; consulte a CI da revisão exata do pacote.
+
+Os guias `docs/TESTE-WINDOWS.md` e `docs/RESULTADOS-VALIDACAO.md` do ambiente gerado orientam a validação humana e o registro de resultados. Nenhum resultado manual deve ser marcado como aprovado antes de sua execução.
