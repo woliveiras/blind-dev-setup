@@ -15,21 +15,21 @@ Não execute `scripts/test-prepare.ps1` para este teste manual: esse script é d
 
 ## A. Cinco etapas na mesma janela
 
-Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executável sem argumentos também deve iniciar o assistente. Na pergunta inicial, use Enter ou `1` para o modo acessível para NVDA, `2` para o visual ou `0` para sair. Registre se essa primeira escolha foi lida e pôde ser respondida sem outro terminal.
+Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executável sem argumentos também deve iniciar o assistente. Na pergunta inicial, use Enter ou `1` para a opção com leitor de tela/NVDA, `2` para iniciar sem leitor de tela ou `0` para sair. Registre se essa primeira escolha foi lida e pôde ser respondida sem outro terminal.
 
-Faça o primeiro teste no modo acessível e registre os cinco passos:
+Faça o primeiro teste no modo com leitor de tela e registre os cinco passos:
 
 1. **Escolher pendrive:** confira nome, letra, tamanho, espaço livre e NTFS. Digite o número da unidade conferida; mesmo uma unidade única exige escolha. `R` atualiza a lista e `0` sai. Um pendrive de 32 GB pode aparecer com aproximadamente 29,7 GiB; o requisito efetivo é ter 12 GiB livres.
 2. **Revisar aplicativos e licenças:** confira o resumo. Use `D` para abrir os detalhes oferecidos e localizar versões e links de licença. Depois volte ao fluxo e digite `ACEITO` somente se concordar.
 3. **Confirmar destino:** confira novamente a unidade e digite `SIM` somente para autorizar o destino escolhido.
 4. **Preparar e verificar:** acompanhe mensagens curtas de progresso. A saída técnica dos instaladores deve ficar no log, não misturada às perguntas. A janela deve permanecer utilizável pelo leitor de tela, sem depender de cor ou animação. Depois da conclusão ou de uma falha, consulte `D` e confira o trecho e o caminho do log.
-5. **Concluir:** confirme preparação e verificação, consulte `D` para detalhes quando oferecido e escolha abrir a pasta, preparar outro pendrive ou sair. No modo acessível, `1` abre a pasta, `2` volta à escolha e `0` sai. Abrir a pasta não deve iniciar NVDA ou VS Code automaticamente. Sair não deve apresentar uma segunda pausa do inicializador.
+5. **Concluir:** confirme preparação e verificação, consulte `D` para detalhes quando oferecido e escolha abrir a pasta, preparar outro pendrive ou sair. No modo com leitor de tela, `1` abre a pasta, `2` volta à escolha e `0` sai. Abrir a pasta não deve iniciar NVDA ou VS Code automaticamente. Sair não deve apresentar uma segunda pausa do inicializador.
 
 Esperado: nenhum arquivo pessoal alterado, pasta final `blind-dev-setup` na unidade selecionada, marcador `READY.txt` e verificação concluída antes do menu de sucesso. Em caso de falha, consulte os detalhes e preserve o log indicado, removendo informações pessoais antes de compartilhar. O assistente deve permitir continuar na mesma janela, sem apresentar uma falha como sucesso.
 
-Repita a escolha de modo usando a opção visual, desta vez verificando a instalação já existente, sem nova etapa de licenças. Navegue pelos formulários usando as teclas indicadas e confirme que o texto dos controles e o foco permanecem compreensíveis. Registre esse resultado separadamente: o funcionamento do modo acessível não aprova o visual, nem o inverso.
+Repita a escolha de modo usando a opção sem leitor de tela, desta vez verificando a instalação já existente, sem nova etapa de licenças. Navegue pelos formulários usando as teclas indicadas e confirme que o texto dos controles e o foco permanecem compreensíveis. Registre esse resultado separadamente: o funcionamento do modo com leitor de tela não aprova o modo sem leitor de tela, nem o inverso.
 
-A verificação é estrutural e de configurações; ela não substitui os testes de execução e acessibilidade a seguir nem prova a integridade completa dos arquivos de terceiros. O nome “modo acessível” não significa validação empírica com NVDA. As extensões Python continuam opcionais.
+A verificação é estrutural e de configurações; ela não substitui os testes de execução e acessibilidade a seguir nem prova a integridade completa dos arquivos de terceiros. O nome “modo com leitor de tela” não significa validação empírica com NVDA. As extensões Python continuam opcionais.
 
 ## B. Primeira abertura e origem das ferramentas
 
@@ -68,7 +68,7 @@ O traceback com `--fail` no exemplo Python é intencional; sua presença e a pos
 
 ## D. Cancelamento, recusa e recuperação na mesma janela
 
-Antes de autorizar uma preparação, teste estas interações no modo acessível; depois confira as ações equivalentes pelos controles do modo visual:
+Antes de autorizar uma preparação, teste estas interações no modo com leitor de tela; depois confira as ações equivalentes pelos controles do modo sem leitor de tela:
 
 - Informe uma opção inválida na lista: a mensagem deve explicar o problema e permitir responder novamente na mesma janela.
 - Use `R`: a lista deve ser atualizada sem fechar o programa.
@@ -84,7 +84,7 @@ Se houver uma falha de preparação, registre-a antes de escolher uma opção pa
 
 ### Diagnóstico opcional pela linha de comando
 
-O fluxo principal acima não exige comandos. Para iniciar um modo diretamente pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo acessível. Para conferir também a interface não interativa, abra o PowerShell na pasta do executável. Troque `E:\` pela letra conferida do pendrive e execute:
+O fluxo principal acima não exige comandos. Para iniciar um modo diretamente pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo com leitor de tela. Para conferir também a interface não interativa, abra o PowerShell na pasta do executável. Troque `E:\` pela letra conferida do pendrive e execute:
 
     .\blind-dev-setup-windows-x64.exe version
     .\blind-dev-setup-windows-x64.exe list-targets

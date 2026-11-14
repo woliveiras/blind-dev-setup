@@ -20,8 +20,8 @@ func runWizard(args []string, stdout, stderr io.Writer, deps Dependencies) int {
 	flags.SetOutput(stderr)
 	explicit := flags.String("target", "", "destino explícito; ainda exige seleção e confirmação")
 	cache := flags.String("cache", "", "diretório opcional para downloads verificados")
-	accessible := flags.Bool("accessible", false, "modo linear para leitor de tela / NVDA")
-	visual := flags.Bool("visual", false, "formulário visual em terminal interativo")
+	accessible := flags.Bool("accessible", false, "iniciar com leitor de tela/NVDA")
+	visual := flags.Bool("visual", false, "iniciar sem leitor de tela")
 	if err := flags.Parse(args); err != nil {
 		return 2
 	}

@@ -142,8 +142,10 @@ func (w *wizard) chooseMode(accessible, visual, terminal bool) bool {
 		w.accessible = false
 		return true
 	}
-	fmt.Fprintln(w.output, "Como deseja usar o assistente?")
-	fmt.Fprintln(w.output, "Enter ou 1: leitor de tela / NVDA. 2: interface visual. 0: sair.")
+	fmt.Fprintln(w.output, "Como deseja iniciar?")
+	fmt.Fprintln(w.output, "0. Sair")
+	fmt.Fprintln(w.output, "1. Com leitor de tela/NVDA (padrão: Enter)")
+	fmt.Fprintln(w.output, "2. Sem leitor de tela")
 	for {
 		line, err := w.input.next()
 		if err != nil {

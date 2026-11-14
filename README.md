@@ -1,6 +1,6 @@
 # blind-dev-setup
 
-Gerador de um ambiente de desenvolvimento portátil para pessoas cegas, com assistente por teclado, modo visual e modo acessível de mensagens lineares para leitores de tela.
+Gerador de um ambiente de desenvolvimento portátil para pessoas cegas, com assistente por teclado para uso com ou sem leitor de tela.
 
 A versão atual prepara um pendrive NTFS para Windows 11 x64 com:
 
@@ -70,7 +70,9 @@ O executável atual não possui assinatura digital. Por isso, o Windows pode apr
 
 ### Assistente na mesma janela
 
-Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. Na pergunta inicial, pressione Enter ou `1` para usar o modo acessível para NVDA, `2` para o modo visual ou `0` para sair. Você não precisa conhecer comandos para escolher o modo.
+Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. Na pergunta inicial, pressione Enter ou `1` para usar a opção com leitor de tela/NVDA, `2` para o modo sem leitor de tela ou `0` para sair. Você não precisa conhecer comandos para escolher o modo.
+
+Essa escolha ajusta a apresentação do assistente; não inicia nem encerra o leitor de tela. Para a opção `1`, abra seu leitor antes de iniciar o assistente.
 
 O assistente tem cinco etapas:
 
@@ -80,13 +82,13 @@ O assistente tem cinco etapas:
 4. **Preparar e verificar:** acompanhe as mensagens curtas de progresso. A saída técnica dos instaladores fica separada no log; a opção de detalhes mostra seu caminho depois da operação.
 5. **Concluir:** escolha abrir a pasta do ambiente no Explorador, preparar outro pendrive ou sair. Para iniciar NVDA e VS Code, abra `START.cmd` na pasta preparada; eles não abrem automaticamente.
 
-No modo acessível, as opções são anunciadas em texto e respondidas com Enter: `R` atualiza os destinos, `0` sai, `D` abre detalhes quando oferecido, `ACEITO` aceita as licenças e `SIM` confirma o destino. O modo visual usa formulários por teclado; siga as opções e teclas indicadas na tela. Os dois modos mantêm as mesmas confirmações e proteções.
+No modo com leitor de tela, as opções são anunciadas em texto e respondidas com Enter: `R` atualiza os destinos, `0` sai, `D` abre detalhes quando oferecido, `ACEITO` aceita as licenças e `SIM` confirma o destino. O modo sem leitor de tela usa formulários por teclado; siga as opções e teclas indicadas na tela. Os dois modos mantêm as mesmas confirmações e proteções.
 
 Se a unidade já tiver uma instalação, o assistente oferece verificá-la, sem preparar novamente nem sobrescrever. Na conclusão ou em caso de falha, a opção de detalhes mostra um trecho do log e permite continuar na mesma janela. O resumo não mistura a saída extensa de downloads e instaladores com as perguntas.
 
-A conclusão confirma preparação e verificação estrutural. A avaliação de uso com NVDA ainda exige o protocolo prático; o nome “modo acessível” descreve o formato de interação, não uma aprovação empírica. As extensões Python permanecem opcionais e têm um guia próprio.
+A conclusão confirma preparação e verificação estrutural. A avaliação de uso com NVDA ainda exige o protocolo prático; o nome “modo com leitor de tela” descreve o formato de interação, não uma aprovação empírica. As extensões Python permanecem opcionais e têm um guia próprio.
 
-Para selecionar um modo diretamente ao iniciar pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo acessível. Os comandos de automação abaixo continuam disponíveis.
+Para selecionar um modo diretamente ao iniciar pelo terminal, use `wizard --accessible` ou `wizard --visual`. Com entrada redirecionada, o assistente usa o modo com leitor de tela. Os comandos de automação abaixo continuam disponíveis.
 
 ### Linha de comando opcional
 

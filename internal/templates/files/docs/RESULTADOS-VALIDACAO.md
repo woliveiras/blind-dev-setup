@@ -17,7 +17,7 @@ Copie este arquivo para registrar uma sessão. Preencha `passou`, `falhou` ou `n
 - Letras usadas antes/depois:
 - Versões de VS Code, Python, Node.js, uv, pnpm e Git:
 - NVDA (versão, instalado/portátil, sintetizador e ajustes relevantes):
-- Modo do assistente (acessível/visual) e legibilidade da escolha inicial:
+- Modo do assistente (com leitor de tela/sem leitor de tela) e legibilidade da escolha inicial:
 - Extensões e versões (`code.cmd --list-extensions --show-versions`):
 - Downloads adicionais ou mudanças de configuração:
 
@@ -26,8 +26,8 @@ Copie este arquivo para registrar uma sessão. Preencha `passou`, `falhou` ou `n
 | Etapa | Resultado | Observado / evidência |
 | --- | --- | --- |
 | Escolha do modo sem CLI, lida pelo NVDA | não executado | |
-| Cinco etapas no modo acessível | não executado | |
-| Modo visual e verificação existente (sem etapa de licenças) | não executado | |
+| Cinco etapas no modo com leitor de tela | não executado | |
+| Modo sem leitor de tela e verificação existente (sem etapa de licenças) | não executado | |
 | Detalhes de licenças e retorno à revisão | não executado | |
 | Progresso resumido, detalhes e caminho do log | não executado | |
 | Descoberta do USB e plano | não executado | |

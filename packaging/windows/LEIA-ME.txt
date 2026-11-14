@@ -10,7 +10,7 @@ PREPARAR NA MESMA JANELA
 
 Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executavel sem argumentos tambem inicia o assistente.
 
-Na pergunta inicial, pressione Enter ou 1 para o modo acessivel para NVDA, 2 para o modo visual ou 0 para sair. Nao e preciso abrir outro terminal ou conhecer comandos para escolher o modo.
+Na pergunta inicial, pressione Enter ou 1 para a opcao com leitor de tela/NVDA, 2 para o modo sem leitor de tela ou 0 para sair. Nao e preciso abrir outro terminal ou conhecer comandos para escolher o modo.
 
 O assistente tem cinco etapas:
 
@@ -20,13 +20,13 @@ O assistente tem cinco etapas:
 4. Preparar e verificar: acompanhe o progresso resumido. A saida tecnica fica no log; consulte detalhes depois da operacao para ver seu caminho.
 5. Concluir: escolha abrir a pasta do ambiente, preparar outro pendrive ou sair. Na pasta, abra START.cmd quando quiser iniciar NVDA e VS Code; eles nao abrem automaticamente.
 
-No modo acessivel, responda as opcoes em texto e pressione Enter: R atualiza a lista, 0 sai, D mostra detalhes quando oferecido, ACEITO aceita as licencas e SIM confirma o destino. No modo visual, use as opcoes e teclas indicadas nos formularios. As protecoes sao iguais nos dois modos.
+No modo com leitor de tela, responda as opcoes em texto e pressione Enter: R atualiza a lista, 0 sai, D mostra detalhes quando oferecido, ACEITO aceita as licencas e SIM confirma o destino. No modo sem leitor de tela, use as opcoes e teclas indicadas nos formularios. As protecoes sao iguais nos dois modos.
 
 Uma unidade ja preparada pode ser verificada na mesma janela, sem reinstalar nem sobrescrever. Em caso de falha, leia o resumo e consulte detalhes ou o log indicado antes de escolher como continuar.
 
 O programa nao formata, nao particiona, nao escolhe um pendrive automaticamente e nao sobrescreve um ambiente existente.
 
-Conclusao significa preparacao e verificacao estrutural. O modo acessivel ainda precisa de validacao pratica com pessoas cegas usando NVDA. Siga TESTE-WINDOWS.md e VALIDACAO.md. As extensoes Python continuam opcionais, conforme EXTENSOES-PYTHON.md.
+Conclusao significa preparacao e verificacao estrutural. O modo com leitor de tela ainda precisa de validacao pratica com pessoas cegas usando NVDA. Siga TESTE-WINDOWS.md e VALIDACAO.md. As extensoes Python continuam opcionais, conforme EXTENSOES-PYTHON.md.
 
 LINHA DE COMANDO OPCIONAL
 
@@ -34,7 +34,7 @@ Os comandos continuam disponiveis para automacao e diagnostico. No PowerShell, n
   .\blind-dev-setup-windows-x64.exe wizard --accessible
   .\blind-dev-setup-windows-x64.exe wizard --visual
 
-Com entrada redirecionada, o assistente usa o modo acessivel.
+Com entrada redirecionada, o assistente usa o modo com leitor de tela.
 
 Procurar pendrives:
   .\blind-dev-setup-windows-x64.exe list-targets
