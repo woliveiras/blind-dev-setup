@@ -13,6 +13,22 @@ Leia o ADR, o manifesto e os limites de evidência. Não trate a presença de ar
 
 Use commits pequenos com Conventional Commits. Não inclua binários de terceiros, credenciais, perfis pessoais do NVDA ou dados de usuários.
 
+## Teste completo de preparação na CI
+
+O job Windows da CI executa `prepare` e `verify` em um disco virtual temporário de 32 GiB, formatado em NTFS. Ele baixa os componentes reais do manifesto, confere seus hashes, instala o toolchain pelo mise e verifica `READY.txt` e a remoção da área de staging. Depois da publicação, executa Python, Node.js, uv e pnpm a partir do ambiente gerado, com a mesma inicialização de confiança e shims do `DEV-SHELL.cmd`.
+
+O teste roda em pushes para `main`, pull requests e acionamentos manuais de CI pelo GitHub Actions. Não usa cache persistente; indisponibilidade das fontes oficiais ou divergência de hashes faz o job falhar. A etapa tem limite de 35 minutos, dentro de um job de 45 minutos. O VHDX cresce conforme os dados são escritos e é desmontado e removido em `finally`, com uma etapa `always()` para repetir a limpeza após interrupções. Uma parada forçada do runner pode impedir a limpeza; o runner hospedado é descartável.
+
+Para reproduzir em Windows, compile com `scripts/build.ps1` e execute em PowerShell 7 como administrador, escolhendo uma pasta temporária que ainda não exista:
+
+```powershell
+./scripts/test-prepare.ps1 -WorkDirectory "$env:TEMP\blind-dev-setup-e2e"
+```
+
+O script cria e formata apenas o disco associado ao seu próprio arquivo VHDX; não recebe uma unidade física de destino. Em caso de interrupção, repita com `-Cleanup` para remover os recursos temporários. O gerador continua sem formatar unidades.
+
+Esse teste usa o Windows do runner e um disco virtual. Não valida detecção USB, interfaces gráficas, acessibilidade com NVDA ou a experiência em Windows 11 como usuário padrão; esses pontos continuam no protocolo de validação manual.
+
 ## Releases
 
 Release Please acompanha os Conventional Commits em `main` e mantém uma PR de release com versão e changelog. Mesclar essa PR é a autorização humana para criar a tag e a GitHub Release.

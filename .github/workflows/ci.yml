@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,6 +32,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -49,5 +51,19 @@ jobs:
         shell: pwsh
         run: |
           .\dist\blind-dev-setup-windows-x64.exe version
+          if ($LASTEXITCODE -ne 0) { throw "version failed" }
           .\dist\blind-dev-setup-windows-x64.exe list-targets
+          if ($LASTEXITCODE -ne 0) { throw "list-targets failed" }
           .\dist\blind-dev-setup-windows-x64.exe plan --target E:\
+          if ($LASTEXITCODE -ne 0) { throw "plan failed" }
+
+      - name: Prepare and verify on a temporary NTFS volume
+        timeout-minutes: 35
+        shell: pwsh
+        run: ./scripts/test-prepare.ps1 -WorkDirectory "$env:RUNNER_TEMP\blind-dev-setup-e2e"
+
+      - name: Clean up temporary NTFS volume
+        if: always()
+        timeout-minutes: 3
+        shell: pwsh
+        run: ./scripts/test-prepare.ps1 -WorkDirectory "$env:RUNNER_TEMP\blind-dev-setup-e2e" -Cleanup
