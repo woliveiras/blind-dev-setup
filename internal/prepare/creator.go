@@ -99,7 +99,7 @@ func (c Creator) Run(ctx context.Context, requestedTarget, cache string, output 
 	}
 
 	finalPath := filepath.Join(details.Path, target.DirectoryName)
-	if err := os.Rename(staging, finalPath); err != nil {
+	if err := publish(ctx, staging, finalPath, output); err != nil {
 		return fmt.Errorf("publicar ambiente concluído: %w", err)
 	}
 	fmt.Fprintf(output, "Preparação concluída: %s\n", finalPath)
