@@ -17,12 +17,16 @@ Documentação oficial usada para o desenho:
 
 Cada ferramenta mantém sua própria licença. plan mostra o identificador e o manifesto contém o link correspondente. O aceite dado ao gerador não altera nem substitui os termos dos fornecedores.
 
-## Helper 7-Zip
+## Helper 7-Zip reduzido (7zr)
 
 A preparação baixa o executável de console `7zr.exe` oficial, versão 26.06, para extrair o pacote Portable Git sem abrir uma janela do autoextrator. O manifesto registra URL, tamanho e SHA-256; o helper fica em `tools/7zip/7zr.exe`.
 
-- [Release oficial 26.06 e código-fonte correspondente](https://github.com/ip7z/7zip/releases/tag/26.06).
-- [Código-fonte na tag 26.06](https://github.com/ip7z/7zip/tree/26.06).
-- [Informações de licença oficiais](https://www.7-zip.org/license.txt), reproduzidas em [LICENSE-7ZIP.txt](LICENSE-7ZIP.txt).
+Este helper reduzido pertence ao LZMA SDK, que Igor Pavlov colocou em domínio público. A licença genérica do pacote completo do 7-Zip não descreve corretamente esse binário específico. O `bin/7zr.exe` do SDK 26.06 foi comparado ao hash e tamanho fixados no manifesto: são os mesmos bytes.
 
-O executável `7zr.exe` usa GNU LGPL 2.1 ou posterior, conforme as informações do fornecedor para os arquivos que não são `7z.dll`. Ele é distribuído sem alterações pelo fornecedor e baixado pelo gerador; o projeto não modifica seu código. Consulte o texto de licença e o código-fonte correspondente na release indicada.
+- [Declaração oficial de domínio público e descrição de 7zr no LZMA SDK](https://www.7-zip.org/sdk.html).
+- [SDK 26.06 com código-fonte, binários e DOC/lzma-sdk.txt](https://github.com/ip7z/7zip/releases/download/26.06/lzma2606.7z).
+- [Release oficial 26.06](https://github.com/ip7z/7zip/releases/tag/26.06).
+- [Alvo de compilação Alone7z que gera 7zr.exe](https://github.com/ip7z/7zip/blob/26.06/CPP/7zip/Bundles/Alone7z/makefile).
+- [Aviso do helper e seção de licença do SDK incluídos neste ambiente](LICENSE-7ZIP.txt).
+
+O projeto baixa o helper sem modificá-lo. O aviso incluído reproduz a seção LICENSE do DOC/lzma-sdk.txt da versão 26.06, com atribuição e links para o código-fonte correspondente.

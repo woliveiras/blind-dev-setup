@@ -110,7 +110,7 @@ func (i Installer) installPortableGit(ctx context.Context, component manifest.Co
 	// standalone console extractor installed from our pinned, verified manifest:
 	// https://www.7-zip.org/download.html
 	// Extract the SHA-256-verified archive without invoking the GUI, then run its
-	// exact upstream post-install command (portable/release.sh in build-extra):
+	// upstream post-install hooks (portable/release.sh in build-extra):
 	// https://github.com/git-for-windows/build-extra/blob/main/portable/release.sh
 	// Do not resolve an extractor from the host PATH. -bsp0 disables its progress
 	// ticker; normal diagnostics and stderr remain available in the build log.
@@ -118,11 +118,50 @@ func (i Installer) installPortableGit(ctx context.Context, component manifest.Co
 	if err := i.Runner.Run(ctx, extractor, []string{"x", "-t7z", "-y", "-bb0", "-bsp0", "-o" + destination, archivePath}, destination, nil, output); err != nil {
 		return fmt.Errorf("extrair Git Portable com 7-Zip verificado: %w", err)
 	}
-	arguments := []string{"--needs-console", "--hide", "--no-cd", "--command=post-install.bat"}
-	if err := i.Runner.Run(ctx, filepath.Join(destination, "git-bash.exe"), arguments, destination, nil, output); err != nil {
-		return fmt.Errorf("configurar Git Portable após extração: %w", err)
+	// The SFX's GUI wrapper starts a new hidden console without inheriting our
+	// diagnostic handles. Run the x64 branch of its post-install.bat directly:
+	// https://github.com/git-for-windows/build-extra/blob/main/post-install.bat
+	// The omitted rebase branch applies only to mingw32, which is not supported
+	// by this bundle. Preserve sourcing in one shell and the final hook's status:
+	// some earlier hooks intentionally return nonzero for already-present files.
+	bash := filepath.Join(destination, "usr", "bin", "bash.exe")
+	arguments := []string{"--noprofile", "--norc", "-c", gitPostInstallScript, "blind-dev-git-post-install", "/etc/post-install"}
+	if err := i.Runner.Run(ctx, bash, arguments, destination, gitPostInstallEnvironment(), output); err != nil {
+		return fmt.Errorf("configurar Git Portable com %s (diretório %s): %w", bash, destination, err)
+	}
+	if err := os.Remove(filepath.Join(destination, "post-install.bat")); err != nil {
+		return fmt.Errorf("remover pós-instalação concluída do Git: %w", err)
 	}
 	return nil
+}
+
+// The hook directory is an argument, never interpolated shell code. Keeping it
+// explicit also allows tests to exercise ordering, cleanup and error reporting.
+const gitPostInstallScript = `export PATH=/usr/bin:/mingw64/bin:$PATH
+export SYSCONFDIR=/etc
+export LC_COLLATE=C
+status=0
+for p in "$1"/*.post; do
+    test -e "$p" || continue
+    printf 'Git post-install: %s\n' "$p"
+    . "$p"
+    status=$?
+    printf 'Git post-install status: %s (%s)\n' "$status" "$p"
+done
+exit "$status"
+`
+
+func gitPostInstallEnvironment() []string {
+	result := make([]string, 0, len(os.Environ())+1)
+	for _, entry := range os.Environ() {
+		key, _, _ := strings.Cut(entry, "=")
+		switch strings.ToUpper(key) {
+		case "MSYSTEM", "BASH_ENV", "ENV", "SHELLOPTS", "BASHOPTS", "CDPATH", "GLOBIGNORE":
+			continue
+		}
+		result = append(result, entry)
+	}
+	return append(result, "MSYSTEM=MINGW64")
 }
 
 func replaceDestination(arguments []string, destination string) []string {
