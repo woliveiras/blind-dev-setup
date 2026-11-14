@@ -28,6 +28,7 @@ func TestWindowsBuildCreatesCompletePortableRelease(t *testing.T) {
 	}
 
 	starter := readFile(t, filepath.Join(root, "packaging", "windows", "INICIAR-AQUI.cmd"))
+	starter = strings.ReplaceAll(starter, "\r\n", "\n")
 	if !strings.Contains(starter, "\"%~dp0blind-dev-setup-windows-x64.exe\"\n") {
 		t.Error("INICIAR-AQUI.cmd must start the wizard without command arguments")
 	}
