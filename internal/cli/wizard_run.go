@@ -141,8 +141,8 @@ func runWizard(args []string, stdout, stderr io.Writer, deps Dependencies) int {
 		} else {
 			fmt.Fprintln(stdout, "Preparação e verificação concluídas.")
 		}
-		fmt.Fprintln(stdout, "Abra START.cmd no pendrive para começar.")
-		if w.finished(chosen.path()) {
+		fmt.Fprintln(stdout, "Escolha Iniciar ambiente para abrir NVDA e VS Code.")
+		if w.finished(chosen) {
 			return w.status
 		}
 	}
@@ -220,9 +220,10 @@ func (w *wizard) showDetails() {
 	fmt.Fprintln(w.output, cleanWizardText(string(content)))
 }
 
-func (w *wizard) finished(path string) bool {
+func (w *wizard) finished(chosen wizardTarget) bool {
 	for {
 		answer, ok := w.ask("O que deseja fazer agora?", "", []wizardOption{
+			{"I", "Iniciar ambiente"},
 			{"1", "Abrir pasta do ambiente"}, {"2", "Escolher outro destino"}, {"D", "Ver detalhes da operação"}, {"0", "Sair"},
 		})
 		if !ok || answer == "0" {
@@ -235,15 +236,52 @@ func (w *wizard) finished(path string) bool {
 			w.showDetails()
 			continue
 		}
+		if answer == "I" {
+			fmt.Fprintln(w.output, "Iniciando ambiente...")
+			if err := w.launch(chosen); err != nil {
+				w.fail("Não foi possível iniciar o ambiente", err)
+				continue
+			}
+			w.status = 0
+			fmt.Fprintln(w.output, "Inicialização solicitada para NVDA e VS Code. Você pode sair do assistente.")
+			continue
+		}
 		if w.deps.OpenEnvironment == nil {
 			w.fail("Não foi possível abrir a pasta", errors.New("abertura indisponível"))
 			continue
 		}
-		if err := w.deps.OpenEnvironment(filepath.Join(path, target.DirectoryName)); err != nil {
+		if err := w.deps.OpenEnvironment(filepath.Join(chosen.path(), target.DirectoryName)); err != nil {
 			w.fail("Não foi possível abrir a pasta", err)
 			continue
 		}
 		w.status = 0
 		fmt.Fprintln(w.output, "Pasta do ambiente aberta. Abra START.cmd para iniciar NVDA e VS Code.")
 	}
+}
+
+func (w *wizard) launch(chosen wizardTarget) error {
+	if w.deps.LaunchEnvironment == nil || w.deps.Verify == nil {
+		return errors.New("inicialização indisponível nesta compilação")
+	}
+	// Preparation has now published the destination. Recheck its device identity
+	// and contents before execution, including after a long stay in the menu.
+	if chosen.details != nil {
+		details := *chosen.details
+		details.DestinationExists = true
+		chosen.details = &details
+	} else {
+		chosen.candidate.DestinationExists = true
+	}
+	if err := w.revalidate(chosen); err != nil {
+		return fmt.Errorf("conferir destino antes de iniciar: %w", err)
+	}
+	log, err := os.OpenFile(w.logPath, os.O_APPEND|os.O_WRONLY, 0)
+	if err != nil {
+		return fmt.Errorf("abrir registro da inicialização: %w", err)
+	}
+	defer log.Close()
+	if err := w.deps.Verify(chosen.path(), log); err != nil {
+		return fmt.Errorf("verificar ambiente antes de iniciar: %w", err)
+	}
+	return w.deps.LaunchEnvironment(filepath.Join(chosen.path(), target.DirectoryName), log)
 }

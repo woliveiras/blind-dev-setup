@@ -72,7 +72,7 @@ Não use latest em URLs ou versões. Uma atualização do DBeaver ou Notepad++ n
 
 ## Acessibilidade
 
-A CLI não interativa e o modo com leitor de tela devem continuar lineares, sem spinners, dependência de cor ou atualização no mesmo lugar da tela. O assistente usa formulários huh e oferece o opção com leitor de tela/NVDA antes da interface sem leitor de tela, sem exigir argumentos. A interface sem leitor de tela pode renderizar formulários, mas toda operação deve ter equivalente pelo teclado e no modo com leitor de tela. Detalhes extensos de aplicativos/licenças ficam sob uma opção explícita; saída técnica de instaladores fica no log indicado ao usuário, separada do resumo de progresso.
+A CLI não interativa e o modo com leitor de tela devem continuar lineares, sem spinners, dependência de cor ou atualização no mesmo lugar da tela. O assistente usa formulários huh e oferece a opção com leitor de tela/NVDA antes da interface sem leitor de tela, sem exigir argumentos. A interface sem leitor de tela pode renderizar formulários, mas toda operação deve ter equivalente pelo teclado e no modo com leitor de tela. Detalhes extensos de aplicativos/licenças ficam sob uma opção explícita; saída técnica de instaladores fica no log indicado ao usuário, separada do resumo de progresso.
 
 Teste os dois modos: o modo com leitor de tela com respostas redirecionadas cobre funcionamento, EOF e consentimento; ele não comprova foco, anúncios ou navegação com um leitor de tela real. Mudanças de transcrição precisam atualizar scripts/test-prepare.ps1. Preferências de fala e add-ons do NVDA permanecem opt-in.
 

@@ -23,7 +23,7 @@ func TestReadmeStartsUsersWithPrebuiltDownloads(t *testing.T) {
 		"https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.zip",
 		"curl.exe -fL",
 		"wget --https-only",
-		"INICIAR-AQUI.cmd",
+		"abra `blind-dev-setup-windows-x64.exe`",
 		"não precisa instalar Go",
 		"não possui assinatura digital",
 		"### Assistente na mesma janela",

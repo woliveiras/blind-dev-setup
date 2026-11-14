@@ -38,13 +38,13 @@ O programa já é distribuído pronto para Windows 11 x64. Você não precisa in
 ### Download pela página do GitHub
 
 1. abra a [página da release mais recente](https://github.com/woliveiras/blind-dev-setup/releases/latest);
-2. em Assets, baixe `blind-dev-setup-windows-x64.zip`;
-3. extraia o ZIP;
-4. conecte o pendrive e abra `INICIAR-AQUI.cmd`.
+2. em Assets, baixe `blind-dev-setup-windows-x64.exe`;
+3. conecte o pendrive;
+4. abra `blind-dev-setup-windows-x64.exe` para iniciar o assistente.
 
-O pacote contém o executável, os guias, a licença e o inicializador `INICIAR-AQUI.cmd`. Ele abre um assistente que conduz a escolha do pendrive, o aceite das licenças, a confirmação do destino, a preparação e a verificação na mesma janela. Ao concluir, você pode abrir a pasta do ambiente, preparar outro pendrive ou sair.
+O executável abre um assistente que conduz a escolha do pendrive, o aceite das licenças, a confirmação do destino, a preparação e a verificação na mesma janela. Ao concluir, você pode iniciar o ambiente, abrir sua pasta, preparar outro pendrive ou sair.
 
-Também é possível [baixar somente o executável](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe) e usá-lo diretamente, sem instalação.
+Você também pode usar o [download direto do executável](https://github.com/woliveiras/blind-dev-setup/releases/latest/download/blind-dev-setup-windows-x64.exe), sem instalação. Se preferir baixar os guias e a licença junto com o programa, escolha `blind-dev-setup-windows-x64.zip`, extraia o ZIP e abra o mesmo executável dentro da pasta extraída.
 
 ### Download com curl
 
@@ -70,9 +70,9 @@ O executável atual não possui assinatura digital. Por isso, o Windows pode apr
 
 ### Assistente na mesma janela
 
-Conecte o pendrive e abra `INICIAR-AQUI.cmd`, ou execute `blind-dev-setup-windows-x64.exe` sem argumentos. Na pergunta inicial, pressione Enter ou `1` para usar a opção com leitor de tela/NVDA, `2` para o modo sem leitor de tela ou `0` para sair. Você não precisa conhecer comandos para escolher o modo.
+Conecte o pendrive e abra `blind-dev-setup-windows-x64.exe` diretamente, sem argumentos. Na pergunta inicial, pressione Enter ou `1` para usar a opção com leitor de tela/NVDA, `2` para o modo sem leitor de tela ou `0` para sair. Você não precisa conhecer comandos para escolher o modo.
 
-Essa escolha ajusta a apresentação do assistente; não inicia nem encerra o leitor de tela. Para a opção `1`, abra seu leitor antes de iniciar o assistente.
+Essa escolha ajusta a apresentação do assistente; não inicia nem encerra o leitor de tela. Para a opção `1`, abra o leitor que já estiver disponível no computador antes de iniciar o assistente. O NVDA Portable do pendrive estará disponível depois da preparação.
 
 O assistente tem cinco etapas:
 
@@ -80,11 +80,13 @@ O assistente tem cinco etapas:
 2. **Revisar aplicativos e licenças:** leia o resumo e abra os detalhes quando desejar consultar a lista completa, versões e links. Aceite as licenças somente se concordar.
 3. **Confirmar destino:** confira a unidade novamente e confirme a preparação. Nada é instalado sem aceite e confirmação.
 4. **Preparar e verificar:** acompanhe as mensagens curtas de progresso. A saída técnica dos instaladores fica separada no log; a opção de detalhes mostra seu caminho depois da operação.
-5. **Concluir:** escolha abrir a pasta do ambiente no Explorador, preparar outro pendrive ou sair. Para iniciar NVDA e VS Code, abra `START.cmd` na pasta preparada; eles não abrem automaticamente.
+5. **Concluir:** após a verificação bem-sucedida, escolha **Iniciar ambiente** (`I` no modo com leitor de tela) para iniciar NVDA Portable e VS Code com o mesmo fluxo de `START.cmd`. Essa ação exige sua escolha explícita e mantém o menu disponível. As outras opções continuam sendo `1` para abrir a pasta no Explorador, `2` para outro pendrive, `D` para detalhes e `0` para sair. Abrir a pasta não inicia os aplicativos; nela, `START.cmd` também permite iniciá-los depois.
 
 No modo com leitor de tela, as opções são anunciadas em texto e respondidas com Enter: `R` atualiza os destinos, `0` sai, `D` abre detalhes quando oferecido, `ACEITO` aceita as licenças e `SIM` confirma o destino. O modo sem leitor de tela usa formulários por teclado; siga as opções e teclas indicadas na tela. Os dois modos mantêm as mesmas confirmações e proteções.
 
 Se a unidade já tiver uma instalação, o assistente oferece verificá-la, sem preparar novamente nem sobrescrever. Na conclusão ou em caso de falha, a opção de detalhes mostra um trecho do log e permite continuar na mesma janela. O resumo não mistura a saída extensa de downloads e instaladores com as perguntas.
+
+Ao escolher **Iniciar ambiente**, o assistente confere novamente o destino e verifica o ambiente antes de executar `START.cmd`. Se essa etapa falhar, consulte `D` para ver os detalhes; o menu continua disponível. A mensagem de inicialização solicitada não comprova que as janelas abriram corretamente: confirme a abertura de NVDA e VS Code.
 
 A conclusão confirma preparação e verificação estrutural. A avaliação de uso com NVDA ainda exige o protocolo prático; o nome “modo com leitor de tela” descreve o formato de interação, não uma aprovação empírica. As extensões Python permanecem opcionais e têm um guia próprio.
 

@@ -8,9 +8,9 @@ Um pacote de teste da CI ainda depende da validacao pratica com NVDA.
 
 PREPARAR NA MESMA JANELA
 
-Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executavel sem argumentos tambem inicia o assistente.
+Conecte o pendrive e abra blind-dev-setup-windows-x64.exe diretamente, sem argumentos, para iniciar o assistente. Se baixou o ZIP, extraia o pacote antes de abrir o executavel.
 
-Na pergunta inicial, pressione Enter ou 1 para a opcao com leitor de tela/NVDA, 2 para o modo sem leitor de tela ou 0 para sair. Nao e preciso abrir outro terminal ou conhecer comandos para escolher o modo.
+Na pergunta inicial, pressione Enter ou 1 para a opcao com leitor de tela/NVDA, 2 para o modo sem leitor de tela ou 0 para sair. Nao e preciso abrir outro terminal ou conhecer comandos para escolher o modo. A opcao com leitor de tela adapta a interface, mas nao inicia o NVDA; use o leitor que ja estiver disponivel durante a preparacao.
 
 O assistente tem cinco etapas:
 
@@ -18,7 +18,7 @@ O assistente tem cinco etapas:
 2. Revisar aplicativos e licencas: leia o resumo e abra detalhes para consultar as ferramentas, versoes e links. Aceite somente se concordar.
 3. Confirmar destino: confira a unidade novamente. Sem aceite das licencas e confirmacao, nada e instalado.
 4. Preparar e verificar: acompanhe o progresso resumido. A saida tecnica fica no log; consulte detalhes depois da operacao para ver seu caminho.
-5. Concluir: escolha abrir a pasta do ambiente, preparar outro pendrive ou sair. Na pasta, abra START.cmd quando quiser iniciar NVDA e VS Code; eles nao abrem automaticamente.
+5. Concluir: depois da verificacao bem-sucedida, escolha Iniciar ambiente (I no modo com leitor de tela) para iniciar NVDA Portable e VS Code pelo mesmo fluxo de START.cmd. O menu continua disponivel depois dessa escolha. As outras opcoes sao 1 para abrir a pasta, 2 para outro pendrive, D para detalhes e 0 para sair. Abrir a pasta nao inicia aplicativos; START.cmd continua disponivel nela para uso posterior.
 
 No modo com leitor de tela, responda as opcoes em texto e pressione Enter: R atualiza a lista, 0 sai, D mostra detalhes quando oferecido, ACEITO aceita as licencas e SIM confirma o destino. No modo sem leitor de tela, use as opcoes e teclas indicadas nos formularios. As protecoes sao iguais nos dois modos.
 

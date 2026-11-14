@@ -44,6 +44,9 @@ func main() {
 		ListTargets:     target.List,
 		Inspect:         target.Inspect,
 		OpenEnvironment: openEnvironment,
+		LaunchEnvironment: func(root string, output io.Writer) error {
+			return launchEnvironment(ctx, root, output)
+		},
 		Prepare: func(request cli.PrepareRequest) error {
 			operation := creator
 			operation.Report = request.Report

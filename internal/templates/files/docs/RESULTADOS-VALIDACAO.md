@@ -31,7 +31,7 @@ Copie este arquivo para registrar uma sessão. Preencha `passou`, `falhou` ou `n
 | Detalhes de licenças e retorno à revisão | não executado | |
 | Progresso resumido, detalhes e caminho do log | não executado | |
 | Descoberta do USB e plano | não executado | |
-| Assistente abre diretamente pelo executável | não executado | |
+| Assistente abre diretamente por blind-dev-setup-windows-x64.exe, sem argumentos | não executado | |
 | Escolha explícita do pendrive, inclusive quando há só um | não executado | |
 | Atualizar lista e corrigir escolha sem fechar a janela | não executado | |
 | Cancelar antes do aceite sem alterar o pendrive | não executado | |
@@ -40,7 +40,11 @@ Copie este arquivo para registrar uma sessão. Preencha `passou`, `falhou` ou `n
 | Menu final: abrir pasta, escolher outro pendrive e sair | não executado | |
 | Prepare e arquivos pessoais preservados | não executado | |
 | Verify | não executado | |
-| START.cmd como primeira entrada | não executado | |
+| Iniciar ambiente (I) somente após verificação e escolha explícita | não executado | |
+| NVDA e VS Code abrem pelo menu final | não executado | |
+| Menu permanece disponível depois de iniciar | não executado | |
+| Abrir pasta (1) não inicia aplicativos | não executado | |
+| START.cmd independente | não executado | |
 | START-VSCODE.cmd independente | não executado | |
 | DEV-SHELL.cmd independente | não executado | |
 | Versões e caminhos vêm do pendrive | não executado | |

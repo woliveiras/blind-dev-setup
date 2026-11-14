@@ -4,15 +4,15 @@ A versão deste ambiente está em READY.txt e config/manifest.json.
 
 Este ambiente foi preparado para Windows 11 x64.
 
-A preparação pode ser feita pelo assistente de INICIAR-AQUI.cmd no pacote do gerador. Na pergunta inicial, Enter ou 1 escolhe a opção com leitor de tela/NVDA; 2 escolhe a opção sem leitor de tela. Não é preciso conhecer comandos para escolher.
+Para preparar o pendrive, abra blind-dev-setup-windows-x64.exe diretamente, sem argumentos. Se baixou o ZIP do gerador, extraia o pacote antes de abrir o executável. Na pergunta inicial, Enter ou 1 escolhe a opção com leitor de tela/NVDA; 2 escolhe a opção sem leitor de tela. Não é preciso conhecer comandos para escolher. Essa opção adapta a interface e não inicia NVDA; use o leitor que já estiver disponível durante a preparação.
 
-As cinco etapas são escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Detalhes extensos e saída técnica ficam separados das perguntas; consulte a opção de detalhes ou o log informado se houver uma falha. Ao terminar, o assistente permite abrir a pasta deste ambiente, preparar outro pendrive ou sair. Abrir a pasta não inicia NVDA ou VS Code: use START.cmd quando desejar.
+As cinco etapas são escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Detalhes extensos e saída técnica ficam separados das perguntas; consulte a opção de detalhes ou o log informado se houver uma falha. Depois da verificação bem-sucedida, escolha Iniciar ambiente (I no modo com leitor de tela) para iniciar NVDA Portable e VS Code pelo fluxo de START.cmd. O menu permanece disponível. As opções 1 para abrir a pasta, 2 para outro pendrive, D para detalhes e 0 para sair continuam disponíveis. Abrir a pasta não inicia aplicativos; use START.cmd quando desejar iniciá-los depois.
 
 Conclusão do assistente e uso do modo com leitor de tela não substituem validação prática com pessoas cegas usando teclado e NVDA.
 
 INICIO RAPIDO
 
-1. Abra START.cmd para iniciar o NVDA Portable e o Visual Studio Code.
+1. Escolha Iniciar ambiente no menu final do assistente ou abra START.cmd no pendrive para iniciar NVDA Portable e Visual Studio Code.
 2. Abra DEV-SHELL.cmd para usar Python, Node.js, Git, uv e pnpm.
 3. Salve seus projetos dentro da pasta workspace.
 4. Leia NVDA.md antes de personalizar fala, símbolos ou add-ons.

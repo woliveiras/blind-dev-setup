@@ -72,6 +72,119 @@ func TestWizardPreparesVerifiesAndOpensInOneSession(t *testing.T) {
 	}
 }
 
+func TestWizardLaunchesOnlyAfterConfirmationAndFreshVerification(t *testing.T) {
+	deps := wizardDependencies(t, "1\nACEITO\nSIM\nI\n0\n")
+	var events []string
+	installed := false
+	deps.ListTargets = func() ([]target.Candidate, error) {
+		candidate := wizardCandidate()
+		candidate.DestinationExists = installed
+		return []target.Candidate{candidate}, nil
+	}
+	deps.Prepare = func(PrepareRequest) error {
+		installed = true
+		events = append(events, "prepare")
+		return nil
+	}
+	deps.Verify = func(string, io.Writer) error {
+		events = append(events, "verify")
+		return nil
+	}
+	deps.LaunchEnvironment = func(root string, log io.Writer) error {
+		if root != filepath.Join("E:\\", target.DirectoryName) {
+			t.Fatalf("launch root = %q", root)
+		}
+		events = append(events, "launch")
+		fmt.Fprintln(log, "launcher diagnostic")
+		return nil
+	}
+	var output bytes.Buffer
+	if code := Run(nil, &output, &output, deps); code != 0 {
+		t.Fatalf("exit=%d output=%s", code, output.String())
+	}
+	if strings.Join(events, ",") != "prepare,verify,verify,launch" {
+		t.Fatalf("operation order = %v", events)
+	}
+	if !strings.Contains(output.String(), "Inicialização solicitada para NVDA e VS Code") || strings.Contains(output.String(), "launcher diagnostic") {
+		t.Fatal(output.String())
+	}
+	logs, _ := filepath.Glob(filepath.Join(os.TempDir(), "blind-dev-setup-*.log"))
+	if len(logs) != 1 {
+		t.Fatalf("logs = %v", logs)
+	}
+	log, err := os.ReadFile(logs[0])
+	if err != nil || !bytes.Contains(log, []byte("launcher diagnostic")) {
+		t.Fatalf("missing launch diagnostics: %v; %s", err, log)
+	}
+}
+
+func TestWizardWillNotLaunchChangedOrUnverifiedEnvironment(t *testing.T) {
+	for _, scenario := range []string{"changed device", "failed verification", "not requested"} {
+		t.Run(scenario, func(t *testing.T) {
+			input := "1\nSIM\nI\n0\n"
+			if scenario == "not requested" {
+				input = "1\nSIM\n0\n"
+			}
+			deps := wizardDependencies(t, input)
+			lists, verifications := 0, 0
+			deps.ListTargets = func() ([]target.Candidate, error) {
+				lists++
+				candidate := wizardCandidate()
+				candidate.DestinationExists = true
+				if scenario == "changed device" && lists >= 3 {
+					candidate.DiskNumber++
+				}
+				return []target.Candidate{candidate}, nil
+			}
+			deps.Verify = func(string, io.Writer) error {
+				verifications++
+				if scenario == "failed verification" && verifications > 1 {
+					return errors.New("environment changed after preparation")
+				}
+				return nil
+			}
+			deps.LaunchEnvironment = func(string, io.Writer) error {
+				t.Fatal("unconfirmed or changed environment was launched")
+				return nil
+			}
+			var output bytes.Buffer
+			code := Run(nil, &output, &output, deps)
+			want := 1
+			if scenario == "not requested" {
+				want = 0
+			}
+			if code != want || strings.Contains(output.String(), "Inicialização solicitada") {
+				t.Fatalf("exit=%d output=%s", code, output.String())
+			}
+		})
+	}
+}
+
+func TestWizardCanRetryFailedLaunchWithoutRepreparing(t *testing.T) {
+	deps := wizardDependencies(t, "1\nSIM\nI\nI\n0\n")
+	deps.ListTargets = func() ([]target.Candidate, error) {
+		candidate := wizardCandidate()
+		candidate.DestinationExists = true
+		return []target.Candidate{candidate}, nil
+	}
+	deps.Prepare = func(PrepareRequest) error { t.Fatal("must not prepare again"); return nil }
+	launches := 0
+	deps.LaunchEnvironment = func(string, io.Writer) error {
+		launches++
+		if launches == 1 {
+			return errors.New("launcher failed")
+		}
+		return nil
+	}
+	var output bytes.Buffer
+	if code := Run(nil, &output, &output, deps); code != 0 || launches != 2 {
+		t.Fatalf("exit=%d launches=%d output=%s", code, launches, output.String())
+	}
+	if strings.Count(output.String(), "Inicialização solicitada") != 1 || !strings.Contains(output.String(), "Não foi possível iniciar o ambiente") {
+		t.Fatal(output.String())
+	}
+}
+
 func TestWizardNeverInfersConsentFromEOFOrRefusal(t *testing.T) {
 	for _, input := range []string{"", "0\n", "1\n", "1\nACEITO\n", "1\nACEITO\nSIM", "1\nNAO\n0\n", "1\nACEITO\nV\n0\n", "1\nsim\n0\n", "1\nACEITO\nerrado\n", "1\nerrado\n", "1\nACEITO\n\n"} {
 		t.Run(strings.ReplaceAll(input, "\n", "_"), func(t *testing.T) {

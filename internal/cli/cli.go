@@ -21,14 +21,15 @@ type PrepareRequest struct {
 }
 
 type Dependencies struct {
-	Manifest        manifest.Manifest
-	Input           io.Reader
-	Context         context.Context
-	ListTargets     func() ([]target.Candidate, error)
-	Inspect         func(string) (target.Details, error)
-	OpenEnvironment func(string) error
-	Prepare         func(PrepareRequest) error
-	Verify          func(target string, output io.Writer) error
+	Manifest          manifest.Manifest
+	Input             io.Reader
+	Context           context.Context
+	ListTargets       func() ([]target.Candidate, error)
+	Inspect           func(string) (target.Details, error)
+	OpenEnvironment   func(string) error
+	LaunchEnvironment func(string, io.Writer) error
+	Prepare           func(PrepareRequest) error
+	Verify            func(target string, output io.Writer) error
 }
 
 func Run(args []string, stdout, stderr io.Writer, dependencies Dependencies) int {

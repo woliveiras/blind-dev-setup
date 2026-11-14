@@ -15,7 +15,7 @@ Não execute `scripts/test-prepare.ps1` para este teste manual: esse script é d
 
 ## A. Cinco etapas na mesma janela
 
-Conecte o pendrive e abra INICIAR-AQUI.cmd. Abrir o executável sem argumentos também deve iniciar o assistente. Na pergunta inicial, use Enter ou `1` para a opção com leitor de tela/NVDA, `2` para iniciar sem leitor de tela ou `0` para sair. Registre se essa primeira escolha foi lida e pôde ser respondida sem outro terminal.
+Extraia o ZIP da revisão escolhida, conecte o pendrive e abra `blind-dev-setup-windows-x64.exe` diretamente, sem argumentos. O executável deve iniciar o assistente. Na pergunta inicial, use Enter ou `1` para a opção com leitor de tela/NVDA, `2` para iniciar sem leitor de tela ou `0` para sair. Registre se essa primeira escolha foi lida e pôde ser respondida sem outro terminal. Escolher a opção com leitor de tela não deve iniciar NVDA; a preparação usa o leitor que já estiver disponível no computador.
 
 Faça o primeiro teste no modo com leitor de tela e registre os cinco passos:
 
@@ -23,7 +23,7 @@ Faça o primeiro teste no modo com leitor de tela e registre os cinco passos:
 2. **Revisar aplicativos e licenças:** confira o resumo. Use `D` para abrir os detalhes oferecidos e localizar versões e links de licença. Depois volte ao fluxo e digite `ACEITO` somente se concordar.
 3. **Confirmar destino:** confira novamente a unidade e digite `SIM` somente para autorizar o destino escolhido.
 4. **Preparar e verificar:** acompanhe mensagens curtas de progresso. A saída técnica dos instaladores deve ficar no log, não misturada às perguntas. A janela deve permanecer utilizável pelo leitor de tela, sem depender de cor ou animação. Depois da conclusão ou de uma falha, consulte `D` e confira o trecho e o caminho do log.
-5. **Concluir:** confirme preparação e verificação, consulte `D` para detalhes quando oferecido e escolha abrir a pasta, preparar outro pendrive ou sair. No modo com leitor de tela, `1` abre a pasta, `2` volta à escolha e `0` sai. Abrir a pasta não deve iniciar NVDA ou VS Code automaticamente. Sair não deve apresentar uma segunda pausa do inicializador.
+5. **Concluir:** depois da preparação e verificação bem-sucedidas, confira que **Iniciar ambiente** aparece em destaque. Digite `I` no modo com leitor de tela ou escolha essa ação no formulário para iniciar NVDA Portable e VS Code pelo fluxo de START.cmd. Antes dessa escolha explícita, os aplicativos não devem abrir. Confirme que o menu continua disponível após a abertura. As outras opções são `1` para abrir a pasta, `2` para outro destino, `D` para detalhes e `0` para sair. Teste `1` separadamente: abrir a pasta não deve iniciar aplicativos. Sair deve encerrar o assistente sem uma segunda pergunta para fechar a janela.
 
 Esperado: nenhum arquivo pessoal alterado, pasta final `blind-dev-setup` na unidade selecionada, marcador `READY.txt` e verificação concluída antes do menu de sucesso. Em caso de falha, consulte os detalhes e preserve o log indicado, removendo informações pessoais antes de compartilhar. O assistente deve permitir continuar na mesma janela, sem apresentar uma falha como sucesso.
 
@@ -33,7 +33,7 @@ A verificação é estrutural e de configurações; ela não substitui os testes
 
 ## B. Primeira abertura e origem das ferramentas
 
-Na pasta aberta pelo assistente, localize `START.cmd`. Feche outras janelas do VS Code para reduzir interferência de instâncias já abertas e abra `START.cmd` primeiro, antes de DEV-SHELL.cmd. Se você saiu do assistente, navegue até a pasta `blind-dev-setup` do pendrive e abra o mesmo arquivo. Confirme que NVDA e VS Code abriram e que foco e mensagens podem ser percebidos. Se já houver NVDA em execução, registre qual instância está ativa; não conte a mera execução do launcher como validação do NVDA portátil.
+Antes de escolher Iniciar ambiente no menu final, feche outras janelas do VS Code para reduzir interferência de instâncias já abertas. Escolha `I` antes de abrir DEV-SHELL.cmd e confirme que NVDA Portable e VS Code abriram e que foco e mensagens podem ser percebidos. Volte à janela do assistente e confirme que o menu permanece disponível. Depois, feche os aplicativos e teste também `START.cmd` diretamente na pasta `blind-dev-setup` do pendrive; ele deve iniciar o mesmo ambiente. Se já houver NVDA em execução, registre qual instância está ativa; não conte a mera execução do launcher como validação do NVDA portátil.
 
 Abra um novo terminal no VS Code usando a paleta Ctrl+Shift+P e o comando de criar terminal. Execute:
 
@@ -101,7 +101,7 @@ Execute o último apenas quando a instalação já existir. Registre o resultado
 
 ## E. Reconexão e mudança da letra
 
-Feche VS Code, terminais, NVDA portátil e demais programas do pendrive. Ejete com segurança, reconecte e confira novamente a letra no assistente, usando `R` quando necessário. Selecione a unidade já preparada e digite `SIM` para verificar a instalação existente, sem sobrescrevê-la. Ao concluir, use `1` para abrir sua pasta. Repita a primeira abertura pelo START.cmd e os comandos de origem das ferramentas. A verificação e a escolha da pasta devem ocorrer pelo próprio assistente, sem depender do comando opcional `verify`.
+Feche VS Code, terminais, NVDA portátil e demais programas do pendrive. Ejete com segurança, reconecte e confira novamente a letra no assistente, usando `R` quando necessário. Selecione a unidade já preparada e digite `SIM` para verificar a instalação existente, sem sobrescrevê-la. Ao concluir, escolha `I` para iniciar o ambiente e repita os comandos de origem das ferramentas. Confira também `1` para abrir a pasta na nova letra. A verificação, o início do ambiente e a abertura da pasta devem ocorrer pelo próprio assistente, sem depender do comando opcional `verify`.
 
 Se for possível testar outra letra com segurança, use uma letra livre para o mesmo pendrive pelas ferramentas do Windows, após fechar todos os programas. A alteração pode exigir ajuda administrativa; não execute os aplicativos como administrador. Não altere letras do sistema ou de outras unidades. Se não realizar essa etapa, marque mudança de letra como pendente.
 

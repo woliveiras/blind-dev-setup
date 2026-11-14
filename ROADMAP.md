@@ -5,7 +5,7 @@ O estado de uma release deve ser conferido pelo pacote, seu BUILD-INFO.txt e pel
 ## Implementado para Windows 11 x64
 
 - Descoberta de volumes USB, destino explícito e preparação de ambiente novo em NTFS, sem formatação pelo gerador.
-- Assistente huh em cinco etapas na mesma janela, com opções com e sem leitor de tela escolhidos sem CLI: escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Detalhes e log técnico ficam separados das perguntas; os comandos não interativos continuam disponíveis.
+- Assistente huh em cinco etapas na mesma janela, com opções com e sem leitor de tela escolhidos sem CLI: escolher pendrive, revisar aplicativos/licenças, confirmar destino, preparar/verificar e concluir. Após verificar, a ação explícita Iniciar ambiente abre NVDA e VS Code e mantém o menu disponível. Detalhes e log técnico ficam separados das perguntas; os comandos não interativos continuam disponíveis.
 - Download de artefatos oficiais fixados, conferência de tamanho/SHA-256, montagem temporária e publicação da pasta final.
 - Git, VS Code, NVDA, Notepad++, DBeaver e mise portáteis, com helper 7-Zip fixado para extração silenciosa; Python, Node.js, uv e pnpm fixados.
 - Verificação estrutural de executáveis e configurações gerenciadas, sem executar aplicativos.
