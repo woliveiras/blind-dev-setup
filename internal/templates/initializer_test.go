@@ -139,8 +139,17 @@ func TestInitializerValidatesBeforeTrustAndWorksAfterRelocation(t *testing.T) {
 				if err := json.Unmarshal([]byte(line), &call); err != nil {
 					t.Fatal(err)
 				}
-				if index == 0 && (len(call.Args) != 3 || call.Args[0] != "trust" || call.Args[1] != "--yes" || call.Args[2] != filepath.Join(root, "config", "mise.toml")) {
-					t.Errorf("trust arguments = %v", call.Args)
+				if index == 0 {
+					if len(call.Args) != 3 || call.Args[0] != "trust" || call.Args[1] != "--yes" {
+						t.Fatalf("trust arguments = %q", call.Args)
+					}
+					// PowerShell expands Windows short names (RUNNER~1) to long
+					// names; compare the file identity, not its spelling.
+					actual, actualErr := os.Stat(call.Args[2])
+					wanted, wantedErr := os.Stat(filepath.Join(root, "config", "mise.toml"))
+					if actualErr != nil || wantedErr != nil || !os.SameFile(actual, wanted) {
+						t.Errorf("trust must target the published managed config, got %q", call.Args[2])
+					}
 				}
 				if index == 1 && strings.Join(call.Args, " ") != "reshim --force" {
 					t.Errorf("reshim arguments = %v", call.Args)
