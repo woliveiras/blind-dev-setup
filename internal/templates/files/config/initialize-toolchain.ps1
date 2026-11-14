@@ -3,6 +3,25 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+function Get-ManagedSHA256 {
+    param([string]$Path)
+
+    # Windows PowerShell can inherit PowerShell 7's module path. Use .NET
+    # directly so hashing does not depend on the Get-FileHash script module.
+    $hasher = [System.Security.Cryptography.SHA256]::Create()
+    $stream = $null
+    try {
+        $stream = [System.IO.File]::OpenRead($Path)
+        return [System.BitConverter]::ToString($hasher.ComputeHash($stream)).Replace('-', '')
+    }
+    finally {
+        if ($null -ne $stream) {
+            $stream.Dispose()
+        }
+        $hasher.Dispose()
+    }
+}
+
 try {
     $root = Split-Path -Parent $PSScriptRoot
     foreach ($entry in @(
@@ -13,7 +32,7 @@ try {
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
             throw "Configuracao obrigatoria ausente: $($entry.Name)."
         }
-        if ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $entry.Hash) {
+        if ((Get-ManagedSHA256 -Path $path) -ne $entry.Hash) {
             throw "Configuracao gerenciada alterada: $($entry.Name). Execute verify com o gerador desta versao."
         }
     }

@@ -58,14 +58,16 @@ func TestInitializerValidatesBeforeTrustAndWorksAfterRelocation(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, scenario := range []struct {
-		name      string
-		alter     string
-		missing   bool
-		fail      string
-		wantCalls int
-		wantError bool
+		name            string
+		alter           string
+		missing         bool
+		fail            string
+		isolatedModules bool
+		wantCalls       int
+		wantError       bool
 	}{
 		{name: "relocated", wantCalls: 2},
+		{name: "isolated module path", isolatedModules: true, wantCalls: 2},
 		{name: "changed config", alter: "mise.toml", wantError: true},
 		{name: "changed lock", alter: "mise.lock", wantError: true},
 		{name: "missing config", alter: "mise.toml", missing: true, wantError: true},
@@ -103,6 +105,20 @@ func TestInitializerValidatesBeforeTrustAndWorksAfterRelocation(t *testing.T) {
 			logPath := filepath.Join(parent, "mise-calls.jsonl")
 			command := exec.Command(powershell, "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", filepath.Join(root, "config", "initialize-toolchain.ps1"))
 			command.Env = append(os.Environ(), "BLIND_DEV_TEST_MISE_LOG="+logPath, "BLIND_DEV_TEST_MISE_FAIL="+scenario.fail)
+			if scenario.isolatedModules {
+				modulePath := filepath.Join(parent, "empty-modules")
+				if err := os.Mkdir(modulePath, 0o755); err != nil {
+					t.Fatal(err)
+				}
+				filtered := command.Env[:0]
+				for _, entry := range command.Env {
+					key, _, _ := strings.Cut(entry, "=")
+					if !strings.EqualFold(key, "PSModulePath") {
+						filtered = append(filtered, entry)
+					}
+				}
+				command.Env = append(filtered, "PSModulePath="+modulePath)
+			}
 			output, runErr := command.CombinedOutput()
 			if (runErr != nil) != scenario.wantError {
 				t.Fatalf("error = %v, want error %v; output: %s", runErr, scenario.wantError, output)
