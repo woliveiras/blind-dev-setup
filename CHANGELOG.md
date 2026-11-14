@@ -2,6 +2,37 @@
 
 As mudanças relevantes deste projeto serão registradas neste arquivo.
 
+## [0.4.0](https://github.com/woliveiras/blind-dev-setup/compare/v0.3.1...v0.4.0) (2026-11-14)
+
+
+### Adicionado
+
+* guide USB preparation through a complete interactive wizard ([421216b](https://github.com/woliveiras/blind-dev-setup/commit/421216bfebc7e5f13929dc2caa1a462170941817))
+* launch NVDA and VS Code from wizard completion menu ([b06ecad](https://github.com/woliveiras/blind-dev-setup/commit/b06ecad813173eef3bfc6254f7a2a8923539275a))
+* organize USB setup with accessible Huh forms ([ed39d21](https://github.com/woliveiras/blind-dev-setup/commit/ed39d21c652d9b752ec7c2e02bde76a2d528084f))
+
+
+### Corrigido
+
+* configure portable Git without a separate console ([c9eee9a](https://github.com/woliveiras/blind-dev-setup/commit/c9eee9aebed9338e793e084e0a88d2fae5fcb239))
+* hash managed configuration without PowerShell module dependencies ([8ee5511](https://github.com/woliveiras/blind-dev-setup/commit/8ee5511dd0caed5d98dbcf060812204bfcfd463f))
+* name startup options by screen reader use ([be55cc4](https://github.com/woliveiras/blind-dev-setup/commit/be55cc45fb8753d5d4bf07ed21995af21376ea94))
+* retry temporary Windows locks when publishing prepared environment ([25ae3c1](https://github.com/woliveiras/blind-dev-setup/commit/25ae3c10252608cbe6780d4f4d47c3e250c634d6))
+* validate portable toolchains and initialize launchers after relocation ([1845186](https://github.com/woliveiras/blind-dev-setup/commit/184518630f549805422656f53d802ac4f7457863))
+
+
+### Documentação
+
+* move user manuals to Wiki and highlight direct download ([548ddcd](https://github.com/woliveiras/blind-dev-setup/commit/548ddcdc544ba17703a7d5bea11c209a0373ed13))
+* prepare Python examples and Windows acceptance protocol ([afdde19](https://github.com/woliveiras/blind-dev-setup/commit/afdde19aa05c3cb4ae7953968f1d7e0818b2c324))
+* record Windows integration evidence and clarify manual test order ([5f51bb4](https://github.com/woliveiras/blind-dev-setup/commit/5f51bb4c5dba1f5b8771b06934057a20c768c654))
+
+
+### Automação
+
+* test full prepare flow on temporary Windows NTFS volume ([5ca881b](https://github.com/woliveiras/blind-dev-setup/commit/5ca881b59d1745bd4b49699747a4b068301aa98f))
+* validate relocated environments and publish traceable test packages ([711ee63](https://github.com/woliveiras/blind-dev-setup/commit/711ee63afc0e9e236ccdc1bb639db41c34c230c3))
+
 ## [0.3.1](https://github.com/woliveiras/blind-dev-setup/compare/v0.3.0...v0.3.1) (2026-08-29)
 
 
